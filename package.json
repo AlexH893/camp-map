@@ -1,0 +1,15 @@
+{
+  "name": "package",
+  "version": "1.0.0",
+  "description": "my package",
+  "main": "index.js",
+  "scripts": {
+    "test": "test"
+  },
+  "author": "me",
+  "license": "ISC",
+  "dependencies": {
+    "@googlemaps/js-api-loader": "^1.16.6",
+    "http-server": "^14.1.1"
+  }
+}

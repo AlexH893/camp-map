@@ -1,5 +1,7 @@
 const express = require("express");
 const cors = require("cors");
+const dotenv = require("dotenv");
+dotenv.config();
 
 const request = require("request");
 const app = express();
@@ -8,7 +10,7 @@ const path = require("path");
 app.use(cors());
 
 const port = 3000;
-let apiKey = "AIzaSyAXeVJtbVR2aBzrXdSxLRfIOBy9U3_qe1Y";
+let apiKey = process.env.API_KEY;
 
 app.get("/api/elevation", (req, res) => {
   const { lat, lng } = req.query;
@@ -60,6 +62,11 @@ app.use((req, res, next) => {
     res.type("text/javascript");
   }
   next();
+});
+
+// Endpoint to serve API key to client
+app.get("/api/getApiKey", (req, res) => {
+  res.json({ apiKey: process.env.API_KEY });
 });
 
 app.listen(port, "::", () => {

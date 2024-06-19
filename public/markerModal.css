@@ -1,0 +1,15 @@
+div#requestedWeather {
+  display: none;
+}
+
+h4 > button#editMarker {
+  margin-left: 0.5vw;
+}
+
+#fileInput {
+  margin-bottom: 2vh;
+}
+
+#delete {
+  margin-left: 15vw;
+}

@@ -1,17 +1,43 @@
-<style>
-  .gm-style-iw-chr {
-    height: 2vh;
-  }
-</style>
-<div class="info-window-content">
-  <h4>Add a marker</h4>
-  <p><!-- ELEVATION_PLACEHOLDER --></p>
-  <p><!-- LATITUDE_PLACEHOLDER --></p>
-  <p><!-- LONGITUDE_PLACEHOLDER --></p>
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Add Marker Modal</title>
+    <link rel="stylesheet" href="addMarkerModal.css" />
+    <script type="module" src="./getWeather.js"></script>
+    <script type="module" src="./addMarker.js"></script>
+  </head>
 
-  <p>Add information about your map marker</p>
+  <body>
+    <div class="info-window-content">
+      <h4>Add a marker</h4>
 
-  <input autofocus required placeholder="Marker name" /> <br />
-  <input placeholder="Notes / comments" /> <br />
-  <button name="submit">Submit</button>
-</div>
+      <button
+        id="getWeather"
+        onclick="console.log(window.selectedLatLng); getWeather(window.selectedLatLng.lat, window.selectedLatLng.lng)"
+      >
+        Get Weather
+      </button>
+
+      <div id="weatherResponse"></div>
+      <div id="geoInfo">
+        <p><!-- ELEVATION_PLACEHOLDER --></p>
+        <p>
+          <!-- LATITUDE_PLACEHOLDER -->
+          <!-- LATITUDE_PLACEHOLDER -->
+        </p>
+        <p>
+          <!-- LONGITUDE_PLACEHOLDER -->
+          <!-- LONGITUDE_PLACEHOLDER -->
+        </p>
+      </div>
+      <p>Add information about your map marker</p>
+
+      <input autofocus required placeholder="Marker name" /> <br />
+      <input placeholder="Notes / comments" class="notes" /> <br />
+      <button name="submit">Submit</button>
+      <button name="delete" class="delete">X</button>
+    </div>
+  </body>
+</html>

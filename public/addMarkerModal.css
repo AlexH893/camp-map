@@ -1,0 +1,66 @@
+.gm-style-iw-chr {
+  height: 1vh;
+}
+
+#map
+  > div
+  > div.gm-style
+  > div:nth-child(1)
+  > div:nth-child(2)
+  > div
+  > div:nth-child(4)
+  > div
+  > div
+  > div
+  > div.gm-style-iw.gm-style-iw-c
+  > div.gm-style-iw-d
+  > div
+  > div
+  > button.delete {
+  margin-left: 45%;
+  width: 4vw;
+  height: 4vh;
+}
+
+#map
+  > div
+  > div.gm-style
+  > div:nth-child(1)
+  > div:nth-child(2)
+  > div
+  > div:nth-child(4)
+  > div
+  > div
+  > div
+  > div.gm-style-iw.gm-style-iw-c
+  > div.gm-style-iw-d
+  > div
+  > div
+  > button:nth-child(11) {
+  margin-top: 5vh;
+}
+
+#map
+  > div
+  > div.gm-style
+  > div:nth-child(1)
+  > div:nth-child(2)
+  > div
+  > div:nth-child(4)
+  > div
+  > div
+  > div
+  > div.gm-style-iw.gm-style-iw-c
+  > div.gm-style-iw-d
+  > div
+  > div
+  > input.notes {
+  margin-top: 3vh;
+}
+/* #weatherResponse {
+  display: none;
+} */
+
+#geoInfo {
+  line-height: 0.5vh;
+}

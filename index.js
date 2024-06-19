@@ -1,7 +1,7 @@
 import { Loader } from "./node_modules/@googlemaps/js-api-loader/dist/index.mjs";
 
 const loader = new Loader({
-  apiKey: "AIzaSyAXeVJtbVR2aBzrXdSxLRfIOBy9U3_qe1Y",
+  apiKey: "test",
   version: "weekly",
   libraries: ["places"], // Specify the libraries you need, in this case "places"
 });

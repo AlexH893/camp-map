@@ -1,3 +1,9 @@
+// addMarker.js
+let selectedLatLng = { lat: null, lng: null };
+window.selectedLatLng = selectedLatLng;
+
+import { getWeather } from "./getWeather.js";
+
 // Fetch content from addMarkerModal.html with XMLHttpRequest
 function fetchContent(elevationInFeet, latLong, callback) {
   let xhr = new XMLHttpRequest();
@@ -32,12 +38,10 @@ function fetchContent(elevationInFeet, latLong, callback) {
 }
 
 let contentString = "";
-let latLng = { lat: -25.363, lng: 131.044 };
-let apiKey = "YOUR_API_KEY_HERE";
+let apiKey = "test";
 
 function getElevation(lat, lng, callback) {
   const elevationUrl = `http://localhost:3000/api/elevation?lat=${lat}&lng=${lng}`;
-  // console.log(`Fetching elevation data from: ${elevationUrl}`);
 
   fetch(elevationUrl)
     .then((response) => {
@@ -48,15 +52,9 @@ function getElevation(lat, lng, callback) {
       return response.json();
     })
     .then((data) => {
-      // console.log("Elevation API response data:", data); // Log the full response data
-
       if (data.status === "OK" && data.results.length > 0) {
-        console.log("test");
-        // Convert elevation from meters to feet
         const elevationInFeet = data.results[0].elevation * 3.28084;
         const latLong = { lat, lng };
-        console.log(elevationInFeet);
-
         callback(null, elevationInFeet, latLong);
       } else {
         callback(new Error(`Elevation API error: ${data.status}`));
@@ -83,6 +81,10 @@ export function addMarker(map) {
 
     const clickListener = map.addListener("click", (event) => {
       const clickedLatLng = event.latLng;
+      window.selectedLatLng = {
+        lat: clickedLatLng.lat(),
+        lng: clickedLatLng.lng(),
+      };
       console.log(`Lat: ${clickedLatLng.lat()}, Lng: ${clickedLatLng.lng()}`);
 
       // Fetch elevation at the clicked position
@@ -93,13 +95,6 @@ export function addMarker(map) {
           if (error) {
             console.log(error);
           } else {
-            console.log(
-              `Elevation at (${clickedLatLng.lat()}, ${clickedLatLng.lng()}) is ${elevationInFeet.toFixed(
-                2
-              )} feet.`
-            );
-
-            // Ensure the content is fetched before adding the marker
             fetchContent(elevationInFeet, latLong, function (responseText) {
               contentString = responseText;
 
@@ -114,7 +109,6 @@ export function addMarker(map) {
                 ariaLabel: "Test",
               });
 
-              // Open the infoWindow immediately after adding the marker
               infoWindow.open({
                 anchor: marker,
                 map,

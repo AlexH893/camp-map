@@ -37,7 +37,7 @@ app.get("/api/currentTemp", (req, res) => {
   const { lat, lng } = req.query;
 
   const currTempUrl =
-    "https://api.open-meteo.com/v1/forecast?latitude=41.2964&longitude=-92.6444&current=temperature_2m&hourly=temperature_2m&forecast_days=1&temperature_unit=fahrenheit";
+    "https://api.open-meteo.com/v1/forecast?latitude=$92.644&longitude=$-104.364&current=temperature_2m,precipitation,cloud_cover&temperature_unit=fahrenheit&precipitation_unit=inch&timezone=America%2FChicago&forecast_days=1";
 
   request(currTempUrl, function (error, response, body) {
     if (error) {

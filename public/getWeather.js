@@ -1,9 +1,7 @@
-// getWeather.js
 export function getWeather(lat, lng) {
   console.log("Weather button clicked");
 
-  const currentTempUrl = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}&current=temperature_2m&hourly=temperature_2m&forecast_days=1&temperature_unit=fahrenheit`;
-
+  const currentTempUrl = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}&current=temperature_2m,precipitation,cloud_cover&temperature_unit=fahrenheit&precipitation_unit=inch&timezone=America%2FChicago&forecast_days=1`;
   fetch(currentTempUrl)
     .then((response) => {
       console.log(`Received response with status: ${response.status}`);
@@ -13,17 +11,18 @@ export function getWeather(lat, lng) {
       return response.json();
     })
     .then((data) => {
-      if (
-        data &&
-        data.hourly &&
-        data.hourly.temperature_2m &&
-        data.hourly.temperature_2m.length > 0
-      ) {
-        const temp = data.hourly.temperature_2m[0];
+      console.log(data); // Log the data to verify structure
+      if (data.current) {
+        const temp = data.current.temperature_2m;
+        const precipitation = data.current.precipitation;
+        const cloud_cover = data.current.cloud_cover;
         console.log(`Temperature: ${temp}°F`);
+        console.log(`Precipitation: ${precipitation} inches`);
+        console.log(`Cloud Cover: ${cloud_cover} %`);
+
         document.getElementById(
           "weatherResponse"
-        ).textContent = `Temperature: ${temp}°F`;
+        ).innerHTML = `Temperature: ${temp}°F<br>Precipitation: ${precipitation} inches<br> Cloud Cover: ${cloud_cover}%`;
       } else {
         console.error("Weather data not available");
       }

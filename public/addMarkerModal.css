@@ -17,9 +17,9 @@
   > div
   > div
   > button.delete {
-  margin-left: 45%;
-  width: 4vw;
-  height: 4vh;
+  margin-left: 30%;
+  width: 3vw;
+  height: 2vh;
 }
 
 #map
@@ -55,7 +55,8 @@
   > div
   > div
   > input.notes {
-  margin-top: 3vh;
+  margin-top: 1.5vh;
+  margin-bottom: 0.5vh;
 }
 /* #weatherResponse {
   display: none;
@@ -63,4 +64,27 @@
 
 #geoInfo {
   line-height: 0.5vh;
+}
+
+#weatherBtnTxt {
+  height: 0.2vh;
+  margin-top: 0.5vh;
+}
+
+#map
+  > div
+  > div.gm-style
+  > div:nth-child(1)
+  > div:nth-child(2)
+  > div
+  > div:nth-child(4)
+  > div
+  > div
+  > div
+  > div.gm-style-iw.gm-style-iw-c
+  > div.gm-style-iw-d
+  > div
+  > div
+  > h4 {
+  margin-top: -0.1vh;
 }

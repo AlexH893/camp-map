@@ -1,6 +1,8 @@
+import { disableButton } from "./disableButton.js";
+
 export function getWeather(lat, lng) {
   console.log("Weather button clicked");
-
+  disableButton();
   const currentTempUrl = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}&current=temperature_2m,precipitation,cloud_cover&temperature_unit=fahrenheit&precipitation_unit=inch&timezone=America%2FChicago&forecast_days=1`;
   fetch(currentTempUrl)
     .then((response) => {

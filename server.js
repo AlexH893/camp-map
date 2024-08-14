@@ -1,4 +1,6 @@
 const express = require("express");
+const sqlite = require("sqlite3");
+
 const cors = require("cors");
 const dotenv = require("dotenv");
 dotenv.config();
@@ -11,6 +13,17 @@ app.use(cors());
 
 const port = 3000;
 let apiKey = process.env.API_KEY;
+
+// Initialize and configure the sqlite3 instance
+const db = new sqlite.Database("./mydb.sqlite", (err) => {
+  if (err) {
+    // Log error if connection fails
+    console.error("Error connecting to the database:", err.message);
+  } else {
+    // Log success message if connection is successful
+    console.log("Successfully connected to the SQLite database.");
+  }
+});
 
 app.get("/api/elevation", (req, res) => {
   const { lat, lng } = req.query;
@@ -62,6 +75,24 @@ app.use((req, res, next) => {
     res.type("text/javascript");
   }
   next();
+});
+
+// Route to create a marker
+
+app.post("/api/add-marker", (req, res) => {
+  const { name, lat, lng, elevation } = req.body;
+
+  const query =
+    "INSERT into camp_locations (name, lat, lng, elevation) VALUES (?,?,?,?)";
+  const params = [name, lat, lng, elevation];
+
+  db.run(query, params, function (err) {
+    if (err) {
+      res.status(500).json({ error: err.message });
+    } else {
+      res.json({ message: "Marker added successfully", id: this.lastID });
+    }
+  });
 });
 
 // Endpoint to serve API key to client

@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="addMarkerModal.css" />
     <script type="module" src="./getWeather.js"></script>
     <script type="module" src="./addMarker.js"></script>
+    <script type="module" src="./disableButton.js"></script>
   </head>
 
   <body>
@@ -17,9 +18,8 @@
         id="getWeather"
         onclick="console.log(window.selectedLatLng); getWeather(window.selectedLatLng.lat, window.selectedLatLng.lng)"
       >
-        Get Weather
+        <p id="weatherBtnTxt">Get Weather</p>
       </button>
-
       <div id="weatherResponse"></div>
       <div id="geoInfo">
         <p><!-- ELEVATION_PLACEHOLDER --></p>
@@ -32,9 +32,8 @@
           <!-- LONGITUDE_PLACEHOLDER -->
         </p>
       </div>
-      <p>Add information about your map marker</p>
 
-      <input autofocus required placeholder="Marker name" /> <br />
+      <input id="name" autofocus required placeholder="Marker name" /> <br />
       <input placeholder="Notes / comments" class="notes" /> <br />
       <button name="submit">Submit</button>
       <button name="delete" class="delete">X</button>

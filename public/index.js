@@ -1,6 +1,9 @@
 import { Loader } from "../node_modules/@googlemaps/js-api-loader/dist/index.mjs";
 import { addMarker } from "./addMarker.js";
 
+let map;
+let inSelectionMode = false;
+
 fetch("/api/getApiKey")
   .then((response) => response.json())
   .then((data) => {
@@ -13,9 +16,8 @@ fetch("/api/getApiKey")
     });
 
     // Initialize and add the map
-    let map, infoWindow;
+    let infoWindow;
     window.addMarker = addMarker;
-    let inSelectionMode = false;
 
     // Load the Google Maps API and initialize the map
     loader
@@ -25,6 +27,13 @@ fetch("/api/getApiKey")
           center: { lat: 39.724596, lng: -105.347991 }, // Example center coordinates
           zoom: 12, // Example zoom level
         });
+
+        if (map instanceof google.maps.Map) {
+          // Map is correctly initialized
+          loadMarkers();
+        } else {
+          console.error("Failed to initialize the map.");
+        }
 
         // Define the bounds for the ground overlay
         const bounds = new google.maps.LatLngBounds(
@@ -53,6 +62,7 @@ fetch("/api/getApiKey")
             const img = document.createElement("img");
             img.src = this.image;
             img.style.width = "100%";
+            img.style.opacity = ".0";
             img.style.height = "100%";
             img.style.position = "absolute";
             this.div.appendChild(img);
@@ -111,7 +121,11 @@ fetch("/api/getApiKey")
             if (this.getMap()) {
               this.setMap(null);
             } else {
-              this.setMap(map);
+              if (map instanceof google.maps.Map) {
+                this.setMap(map);
+              } else {
+                console.error("Invalid map object passed to setMap.");
+              }
             }
           }
         }
@@ -246,6 +260,7 @@ fetch("/api/getApiKey")
             handleLocationError(false, infoWindow, map.getCenter());
           }
         });
+        loadMarkers();
       })
       .catch((error) => {
         console.error("Error loading Google Maps:", error);
@@ -264,4 +279,21 @@ function handleLocationError(browserHasGeolocation, infoWindow, pos) {
   infoWindow.setPosition(pos);
   infoWindow.setContent(errorMessage);
   infoWindow.open(map);
+}
+
+function loadMarkers() {
+  fetch("/api/markers")
+    .then((response) => response.json())
+    .then((markers) => {
+      markers.forEach((marker) => {
+        console.log("Adding marker:", marker); // Log each marker before adding it
+
+        new google.maps.Marker({
+          position: { lat: marker.lat, lng: marker.lng },
+          map: map,
+          title: marker.name,
+        });
+      });
+    })
+    .catch((error) => console.error("error loading markers:", error));
 }

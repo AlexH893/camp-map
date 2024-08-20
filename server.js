@@ -10,6 +10,7 @@ const app = express();
 const path = require("path");
 
 app.use(cors());
+app.use(express.json());
 
 const port = 3000;
 let apiKey = process.env.API_KEY;
@@ -78,7 +79,6 @@ app.use((req, res, next) => {
 });
 
 // Route to create a marker
-
 app.post("/api/add-marker", (req, res) => {
   const { name, lat, lng, elevation } = req.body;
 
@@ -91,6 +91,19 @@ app.post("/api/add-marker", (req, res) => {
       res.status(500).json({ error: err.message });
     } else {
       res.json({ message: "Marker added successfully", id: this.lastID });
+    }
+  });
+});
+
+// Route to get all markers from db
+app.get("/api/markers", (req, res) => {
+  const query = "SELECT * FROM camp_locations";
+
+  db.all(query, [], (err, rows) => {
+    if (err) {
+      res.status(500).json({ error: err.message });
+    } else {
+      res.json(rows);
     }
   });
 });

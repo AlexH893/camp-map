@@ -6,7 +6,6 @@
     <title>Add Marker Modal</title>
     <link rel="stylesheet" href="addMarkerModal.css" />
     <script type="module" src="./getWeather.js"></script>
-    <script type="module" src="./addMarker.js"></script>
     <script type="module" src="./disableButton.js"></script>
   </head>
 
@@ -35,8 +34,9 @@
 
       <input id="name" autofocus required placeholder="Marker name" /> <br />
       <input placeholder="Notes / comments" class="notes" /> <br />
-      <button name="submit">Submit</button>
+      <button id="submit-button" name="submit">Submit</button>
       <button name="delete" class="delete">X</button>
     </div>
+    <script type="module" src="./addMarker.js"></script>
   </body>
 </html>

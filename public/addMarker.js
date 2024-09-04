@@ -1,4 +1,8 @@
-// Util function to handle HTTP requests
+let inSelectionMode = false;
+export let currentInfoWindow = null;
+let markerCounter = 0;
+
+// Utility function to handle HTTP requests
 async function fetchContent(url) {
   try {
     const response = await fetch(url);
@@ -11,14 +15,17 @@ async function fetchContent(url) {
   }
 }
 
-function updateContent(content, elevationInFeet, latLong) {
+// Updates the content of a modal template with specific marker details
+function updateContent(content, elevationInFeet, latLong, name, markerId) {
   return content
     .replace(
       "<!-- ELEVATION_PLACEHOLDER -->",
       `Elevation: ${elevationInFeet.toFixed(2)} feet`
     )
     .replace("<!-- LATITUDE_PLACEHOLDER -->", `Latitude: ${latLong.lat}`)
-    .replace("<!-- LONGITUDE_PLACEHOLDER -->", `Longitude: ${latLong.lng}`);
+    .replace("<!-- LONGITUDE_PLACEHOLDER -->", `Longitude: ${latLong.lng}`)
+    .replace("<!-- NAME_PLACEHOLDER -->", name)
+    .replace("<!-- DYNAMIC_ID -->", markerId);
 }
 
 async function getElevation(lat, lng) {
@@ -49,9 +56,9 @@ async function submitMarker(name, lat, lng, elevationInFeet, infoWindow) {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        name: name,
-        lat: lat,
-        lng: lng,
+        name,
+        lat,
+        lng,
         elevation: elevationInFeet,
       }),
     });
@@ -60,9 +67,12 @@ async function submitMarker(name, lat, lng, elevationInFeet, infoWindow) {
 
     const data = await response.json();
     console.log("Marker added:", data.message);
+    inSelectionMode = false;
 
     // Close the infoWindow after successful submission
-    infoWindow.close();
+    if (infoWindow) {
+      infoWindow.close();
+    }
   } catch (error) {
     console.error("Error submitting marker:", error);
   }
@@ -73,33 +83,39 @@ export async function addMarker(map) {
   const snackbar = document.getElementById("snackbar");
   snackbar.className = "show";
 
-  setTimeout(
-    () => (snackbar.className = snackbar.className.replace("show", "")),
-    3000
-  );
+  setTimeout(() => {
+    snackbar.className = snackbar.className.replace("show", "");
+  }, 3000);
 
-  let inSelectionMode = true;
+  inSelectionMode = true;
 
   if (inSelectionMode) {
-    console.log("Selection mode activated. Click on the map to add a marker.");
-
     const clickListener = map.addListener("click", async (event) => {
       const { lat, lng } = event.latLng.toJSON();
       window.selectedLatLng = { lat, lng };
-      console.log(`Lat: ${lat}, Lng: ${lng}`);
 
       try {
         const { elevationInFeet, latLong } = await getElevation(lat, lng);
         const contentUrl = "addMarkerModal.html";
 
         let content = await fetchContent(contentUrl);
-        content = updateContent(content, elevationInFeet, latLong);
+        content = updateContent(
+          content,
+          elevationInFeet,
+          latLong,
+          "New Marker",
+          `marker-${markerCounter++}`
+        );
 
         const marker = new google.maps.Marker({
           position: event.latLng,
           map: map,
           title: "New Marker",
         });
+
+        // Store the marker in the global markers object
+        window.markers = window.markers || {};
+        window.markers[marker.id] = marker; // Use the unique marker ID
 
         const infoWindow = new google.maps.InfoWindow({
           content: content,
@@ -108,16 +124,10 @@ export async function addMarker(map) {
 
         infoWindow.open({ anchor: marker, map, shouldFocus: false });
 
-        marker.addListener("click", () => {
-          map.setCenter(marker.getPosition());
-          infoWindow.open({ anchor: marker, map, shouldFocus: false });
-        });
-
         // Attach the submit function to the button after modal content is loaded
         setTimeout(() => {
           const submitButton = document.getElementById("submit-button");
           if (submitButton) {
-            console.log("Submit button found. Attaching event listener.");
             submitButton.addEventListener("click", () => {
               const nameInput = document.getElementById("name");
               const name = nameInput ? nameInput.value : "Unnamed Marker";
@@ -126,7 +136,7 @@ export async function addMarker(map) {
                 window.selectedLatLng.lat,
                 window.selectedLatLng.lng,
                 elevationInFeet,
-                infoWindow // Pass the infoWindow to the submitMarker function
+                infoWindow
               );
             });
           } else {
@@ -134,6 +144,10 @@ export async function addMarker(map) {
           }
         }, 0); // Wait for the DOM to update with the loaded content
 
+        // Ensure click event is attached to the new marker
+        handleMarkerClick(marker);
+
+        // Remove the clickListener after adding the marker
         google.maps.event.removeListener(clickListener);
       } catch (error) {
         console.error("Error adding marker:", error);
@@ -142,32 +156,43 @@ export async function addMarker(map) {
   }
 }
 
-// Handle marker info window
-export async function clickMarker(map) {
-  if ((inSelectionMode = false)) {
-    const clickListener = map.addListener("click", async (event) => {
-      try {
-        const contentUrl = "markerModal.html";
+// Handle marker click
+export async function handleMarkerClick(marker) {
+  marker.addListener("click", async () => {
+    try {
+      const contentUrl = "markerModal.html";
+      const { lat, lng } = marker.getPosition().toJSON();
+      const { elevationInFeet, latLong } = await getElevation(lat, lng);
 
-        let content = await fetchContent(contentUrl);
-        content = updateContent(content);
+      let content = await fetchContent(contentUrl);
+      content = updateContent(
+        content,
+        elevationInFeet,
+        latLong,
+        marker.getTitle(),
+        marker.id
+      );
 
-        const infoWindow = new google.maps.InfoWindow({
-          content: content,
-          ariaLabel: "Test",
-        });
-
-        infoWindow.open({ anchor: marker, map, shouldFocus: false });
-
-        marker.addListener("click", () => {
-          map.setCenter(marker.getPosition());
-          infoWindow.open({ anchor: marker, map, shouldFocus: false });
-        });
-
-        // google.maps.event.removeListener(clickListener);
-      } catch (error) {
-        console.error("Error adding marker:", error);
+      // Close the previously opened InfoWindow
+      if (currentInfoWindow) {
+        currentInfoWindow.close();
       }
-    });
-  }
+
+      const infoWindow = new google.maps.InfoWindow({
+        content: content,
+        ariaLabel: "Marker Information",
+      });
+
+      infoWindow.open({
+        anchor: marker,
+        map: marker.getMap(),
+        shouldFocus: false,
+      });
+
+      // Update the global currentInfoWindow reference
+      currentInfoWindow = infoWindow;
+    } catch (error) {
+      console.error("Error displaying marker modal:", error);
+    }
+  });
 }

@@ -95,9 +95,35 @@ app.post("/api/add-marker", (req, res) => {
   });
 });
 
+// Route to update deleted marker flag
+app.put("/api/delete-marker", (req, res) => {
+  const { deleted, id } = req.body;
+
+  const query = `
+    UPDATE camp_locations
+    SET deleted = ?
+    WHERE id = ?
+  `;
+  const params = [deleted, id];
+
+  db.run(query, params, function (err) {
+    if (err) {
+      res.status(500).json({ error: err.message });
+    } else if (this.changes === 0) {
+      res.status(404).json({ message: "No matching record found to update" });
+    } else {
+      res.json({
+        success: true,
+        message: "Marker marked deleted",
+        changes: this.changes,
+      });
+    }
+  });
+});
+
 // Route to get all markers from db
 app.get("/api/markers", (req, res) => {
-  const query = "SELECT * FROM camp_locations";
+  const query = "SELECT * FROM camp_locations WHERE deleted = 0";
 
   db.all(query, [], (err, rows) => {
     if (err) {

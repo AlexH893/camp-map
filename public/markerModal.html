@@ -1,35 +1,41 @@
-<div class="info-window-content">
-  <link rel="stylesheet" href="markerModal.css" />
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="markerModal.css" />
+  </head>
+  <body>
+    <div class="info-window-content">
+      <h4 id="markerName"><!-- NAME_PLACEHOLDER --></h4>
 
-  <h4>Marker Name <button id="editMarker">edit</button></h4>
+      <button
+        id="getWeather"
+        onclick="console.log(window.selectedLatLng); getWeather(window.selectedLatLng.lat, window.selectedLatLng.lng)"
+      >
+        <p id="weatherBtnTxt">Get Weather</p>
+      </button>
 
-  <!--button class="getWeather">Get Weather</!--button>-->
+      <div id="weatherResponse"></div>
+      <div id="geoInfo">
+        <p><!-- ELEVATION_PLACEHOLDER --></p>
+        <p><!-- LATITUDE_PLACEHOLDER --></p>
+        <p><!-- LONGITUDE_PLACEHOLDER --></p>
+      </div>
 
-  <div id="requestedWeather"></div>
-
-  <p>
-    Elevation: 10,420 ft.
-    <!-- ELEVATION_PLACEHOLDER -->
-  </p>
-  <p>
-    Lat: 110.2343
-    <!-- LATITUDE_PLACEHOLDER -->
-  </p>
-  <p>
-    Lng: -109.3454
-    <!-- LONGITUDE_PLACEHOLDER -->
-  </p>
-
-  <input autofocus required placeholder="Marker name" hidden /> <br />
-
-  <p class="markerNotes">Your marker information</p>
-
-  <input placeholder="Notes / comments" class="notes" hidden /> <br />
-
-  <div id="fileInput"><input type="file" id="myFile" name"filename"></div>
-
-  <button name="submit">Save</button>
-  <div id="delete">
-    <button name="delete" class="delete">X</button>
-  </div>
-</div>
+      <!-- The delete button -->
+      <button
+        name="delete"
+        class="delete"
+        data-id="<!-- DYNAMIC_ID -->"
+        onclick="handleDelete(this)"
+      >
+        Delete
+      </button>
+    </div>
+    <script type="module" src="./getWeather.js"></script>
+    <script type="module" src="./disableButton.js"></script>
+    <script type="module" src="./addMarker.js"></script>
+    <script type="module" src="./deleteMarker.js"></script>
+  </body>
+</html>

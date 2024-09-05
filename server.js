@@ -80,11 +80,11 @@ app.use((req, res, next) => {
 
 // Route to create a marker
 app.post("/api/add-marker", (req, res) => {
-  const { name, lat, lng, elevation } = req.body;
+  const { name, desc, lat, lng, elevation } = req.body;
 
   const query =
-    "INSERT into camp_locations (name, lat, lng, elevation) VALUES (?,?,?,?)";
-  const params = [name, lat, lng, elevation];
+    "INSERT into camp_locations (name, desc, lat, lng, elevation) VALUES (?,?,?,?,?)";
+  const params = [name, desc, lat, lng, elevation];
 
   db.run(query, params, function (err) {
     if (err) {

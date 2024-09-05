@@ -10,6 +10,18 @@ h4 > button#editMarker {
   margin-bottom: 2vh;
 }
 
-#delete {
-  margin-left: 15vw;
+.delete {
+  margin-left: 1vw;
+  width: 5vw;
+}
+
+#markerName {
+  margin-top: 1em;
+}
+
+#getWeather {
+}
+#weatherBtnTxt {
+  height: 0.3em;
+  margin-top: -0.1em;
 }

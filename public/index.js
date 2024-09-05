@@ -1,8 +1,8 @@
 import { Loader } from "../node_modules/@googlemaps/js-api-loader/dist/index.mjs";
-import { addMarker } from "./addMarker.js";
+import { addMarker, handleMarkerClick } from "./addMarker.js";
 
 let map;
-let inSelectionMode = false;
+window.markers = {};
 
 fetch("/api/getApiKey")
   .then((response) => response.json())
@@ -12,7 +12,7 @@ fetch("/api/getApiKey")
     const loader = new Loader({
       apiKey: apiKey,
       version: "weekly",
-      libraries: ["places"], // Specify the libraries you need, in this case "places"
+      libraries: ["places"],
     });
 
     // Initialize and add the map
@@ -166,7 +166,6 @@ fetch("/api/getApiKey")
           .getElementById("addMarkerButton")
           .addEventListener("click", () => addMarker(map));
 
-        // const addMarkerButton = document.getElementById("addMarkerButton");
         map.controls[google.maps.ControlPosition.BOTTOM_RIGHT].push(
           addMarkerButton
         );
@@ -281,19 +280,29 @@ function handleLocationError(browserHasGeolocation, infoWindow, pos) {
   infoWindow.open(map);
 }
 
-function loadMarkers() {
+// Loading markers
+export function loadMarkers() {
   fetch("/api/markers")
     .then((response) => response.json())
-    .then((markers) => {
-      markers.forEach((marker) => {
-        console.log("Adding marker:", marker); // Log each marker before adding it
+    .then((markersData) => {
+      // Clear existing markers
+      Object.values(window.markers).forEach((marker) => marker.setMap(null));
+      window.markers = {};
 
-        new google.maps.Marker({
-          position: { lat: marker.lat, lng: marker.lng },
+      markersData.forEach((markerData) => {
+        const marker = new google.maps.Marker({
+          position: { lat: markerData.lat, lng: markerData.lng },
           map: map,
-          title: marker.name,
+          title: markerData.name,
+          id: markerData.id,
         });
+
+        // Store marker in the global markers object
+        window.markers[markerData.id] = marker;
+
+        // Attach click event for modal display
+        handleMarkerClick(marker);
       });
     })
-    .catch((error) => console.error("error loading markers:", error));
+    .catch((error) => console.error("Error loading markers:", error));
 }

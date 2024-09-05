@@ -24,7 +24,7 @@ fetch("/api/getApiKey")
       .load()
       .then(() => {
         map = new google.maps.Map(document.getElementById("map"), {
-          center: { lat: 39.724596, lng: -105.347991 }, // Example center coordinates
+          center: { lat: 39.85664657967366, lng: -105.3838304599834 }, // Example center coordinates
           zoom: 12, // Example zoom level
         });
 
@@ -37,7 +37,7 @@ fetch("/api/getApiKey")
 
         // Define the bounds for the ground overlay
         const bounds = new google.maps.LatLngBounds(
-          new google.maps.LatLng(37.0, -109.045), // Southwest corner of Colorado
+          new google.maps.LatLng(39.62237, -105.486045), // Southwest corner of Colorado
           new google.maps.LatLng(41.0, -102.041)
         );
 

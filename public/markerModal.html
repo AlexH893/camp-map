@@ -10,13 +10,6 @@
       <h4 id="markerName"><!-- NAME_PLACEHOLDER --></h4>
       <p id="markerDesc"><!-- DESCRIPTION_PLACEHOLDER --></p>
 
-      <button
-        id="getWeather"
-        onclick="console.log(window.selectedLatLng); getWeather(window.selectedLatLng.lat, window.selectedLatLng.lng)"
-      >
-        <p id="weatherBtnTxt">Get Weather</p>
-      </button>
-
       <div id="weatherResponse"></div>
       <div id="geoInfo">
         <p><!-- ELEVATION_PLACEHOLDER --></p>
@@ -24,7 +17,16 @@
         <p><!-- LONGITUDE_PLACEHOLDER --></p>
       </div>
 
+      <button name="edit" class="edit">Edit</button>
       <!-- The delete button -->
+
+      <button
+        id="getWeather"
+        onclick="getWeather(window.selectedLatLng.lat, window.selectedLatLng.lng)"
+      >
+        <p id="weatherBtnTxt">Get Weather</p>
+      </button>
+
       <button
         name="delete"
         class="delete"

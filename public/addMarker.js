@@ -182,8 +182,14 @@ export async function handleMarkerClick(marker) {
     try {
       const contentUrl = "markerModal.html";
       const { lat, lng } = marker.getPosition().toJSON();
+
+      // Set window.selectLatLng to marker's position
+      window.selectedLatLng = { lat, lng };
+      console.log(window.selectedLatLng);
+
       const { elevationInFeet, latLong } = await getElevation(lat, lng);
 
+      console.log("lat: " + lat, "long: " + lng);
       let content = await fetchContent(contentUrl);
       content = updateContent(
         content,

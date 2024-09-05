@@ -31,10 +31,10 @@
         </p>
       </div>
 
-      <input id="name" autofocus required placeholder="Marker name" /> <br />
-      <input placeholder="Notes / comments" class="notes" /> <br />
+      <input id="name" required placeholder="Marker name" autofocus /> <br />
+      <input id="desc" placeholder="Description" maxlength="30" /> <br />
       <button id="submit-button" name="submit">Submit</button>
-      <button name="delete" class="delete">X</button>
+      <button name="close" class="close" onclick="deleteAddition();">X</button>
     </div>
     <script type="module" src="./addMarker.js"></script>
     <script type="module" src="./getWeather.js"></script>

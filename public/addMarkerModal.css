@@ -88,3 +88,11 @@
   > h4 {
   margin-top: -0.1vh;
 }
+
+#name {
+  margin-bottom: 1em;
+}
+
+#desc {
+  margin-bottom: 1em;
+}

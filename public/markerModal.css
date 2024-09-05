@@ -25,3 +25,21 @@ h4 > button#editMarker {
   height: 0.3em;
   margin-top: -0.1em;
 }
+
+/* 
+  The area at top of an infoWindow
+*/
+#map
+  > div
+  > div.gm-style
+  > div:nth-child(1)
+  > div:nth-child(2)
+  > div
+  > div:nth-child(4)
+  > div
+  > div
+  > div
+  > div.gm-style-iw.gm-style-iw-c
+  > div.gm-style-iw-chr {
+  height: 1em;
+}

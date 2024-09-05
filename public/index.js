@@ -300,6 +300,8 @@ export function loadMarkers() {
         // Store marker in the global markers object
         window.markers[markerData.id] = marker;
 
+        marker.desc = markerData.desc;
+
         // Attach click event for modal display
         handleMarkerClick(marker);
       });

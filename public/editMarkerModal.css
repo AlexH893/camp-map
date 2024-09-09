@@ -1,0 +1,43 @@
+#editModalContainer {
+  display: none;
+  /* You can also style the modal here */
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: white;
+  padding: 20px;
+  border-radius: 10px;
+  z-index: 1000;
+}
+
+#editModalContainer.show {
+  display: block;
+}
+
+#coords {
+  margin-top: 10px;
+}
+
+#coords ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+#coords li {
+  margin-bottom: 8px;
+  font-size: 14px;
+}
+
+#coords strong {
+  display: inline-block;
+  width: 100px; /* Adjust width as needed */
+}
+
+.close {
+  position: absolute;
+  top: 10px; /* Distance from top of the modal */
+  right: 10px; /* Distance from right of the modal */
+  cursor: pointer;
+}

@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="editMarkerModal.css" />
+  </head>
+  <body>
+    <div id="editModalContainer" class="modal">
+      <div class="modal-content">
+        <span class="close" onclick="closeModal()" style="cursor: pointer"
+          >×</span
+        >
+        <h4>Edit Marker</h4>
+        <input id="name" placeholder="Marker name" />
+        <input id="desc" placeholder="Description" maxlength="30" />
+        <div id="coords">
+          <ul>
+            <li><strong>Latitude:</strong> <span id="lat"></span></li>
+            <li><strong>Longitude:</strong> <span id="lng"></span></li>
+            <li><strong>Elevation:</strong> <span id="elevation"></span></li>
+          </ul>
+        </div>
+        <button id="submit" data-id="markerId">Submit</button>
+      </div>
+    </div>
+  </body>
+</html>

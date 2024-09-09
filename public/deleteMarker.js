@@ -3,7 +3,7 @@ import { loadMarkers } from "./index.js";
 
 export async function handleDelete(button) {
   const id = button.getAttribute("data-id");
-
+  console.log(id);
   // Close current InfoWindow if open
   if (currentInfoWindow) {
     currentInfoWindow.close();
@@ -48,6 +48,5 @@ export async function deleteMarker(id) {
   }
 }
 
-// Ensure functions are accessible globally
 window.handleDelete = handleDelete;
 window.deleteMarker = deleteMarker;

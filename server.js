@@ -121,6 +121,34 @@ app.put("/api/delete-marker", (req, res) => {
   });
 });
 
+// Route to update marker info
+app.put("/api/update-marker/:id", (req, res) => {
+  const { name, desc } = req.body;
+  const { id } = req.params;
+
+  const query = `
+    UPDATE camp_locations
+    SET name = ?,
+        desc = ?
+    WHERE id = ?
+  `;
+  const params = [name, desc, id];
+
+  db.run(query, params, function (err) {
+    if (err) {
+      res.status(500).json({ error: err.message });
+    } else if (this.changes === 0) {
+      res.status(404).json({ message: "No matching record found to update" });
+    } else {
+      res.json({
+        success: true,
+        message: "Marker updated",
+        changes: this.changes,
+      });
+    }
+  });
+});
+
 // Route to get all markers from db
 app.get("/api/markers", (req, res) => {
   const query = "SELECT * FROM camp_locations WHERE deleted = 0";
@@ -130,6 +158,22 @@ app.get("/api/markers", (req, res) => {
       res.status(500).json({ error: err.message });
     } else {
       res.json(rows);
+    }
+  });
+});
+
+// Route to get a marker by id
+app.get("/api/markers/:id", (req, res) => {
+  const markerId = req.params.id;
+  const query = "SELECT * FROM camp_locations WHERE id = ? AND deleted = 0";
+
+  db.get(query, [markerId], (err, row) => {
+    if (err) {
+      res.status(500).json({ error: err.message });
+    } else if (!row) {
+      res.status(404).json({ error: "Marker not found" });
+    } else {
+      res.json(row);
     }
   });
 });

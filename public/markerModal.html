@@ -17,12 +17,11 @@
         <p><!-- LONGITUDE_PLACEHOLDER --></p>
       </div>
 
-      <button name="edit" class="edit">Edit</button>
-      <!-- The delete button -->
+      <button class="edit" data-id="<!-- DYNAMIC_ID -->">Edit</button>
 
       <button
         id="getWeather"
-        onclick="getWeather(window.selectedLatLng.lat, window.selectedLatLng.lng)"
+        onclick="window.getWeather(window.selectedLatLng.lat, window.selectedLatLng.lng)"
       >
         <p id="weatherBtnTxt">Get Weather</p>
       </button>
@@ -30,15 +29,12 @@
       <button
         name="delete"
         class="delete"
-        data-id="<!-- DYNAMIC_ID -->"
-        onclick="handleDelete(this)"
+        data-id="<!-- DYNAMIC_ID2 -->"
+        onclick="window.handleDelete(this)"
       >
         Delete
       </button>
     </div>
-    <script type="module" src="./getWeather.js"></script>
-    <script type="module" src="./disableButton.js"></script>
-    <script type="module" src="./addMarker.js"></script>
-    <script type="module" src="./deleteMarker.js"></script>
+    <script type="module" src="./editMarker.js"></script>
   </body>
 </html>

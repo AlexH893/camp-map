@@ -19,8 +19,6 @@ h4 > button#editMarker {
   margin-top: 1em;
 }
 
-#getWeather {
-}
 #weatherBtnTxt {
   height: 0.3em;
   margin-top: -0.1em;
@@ -42,4 +40,8 @@ h4 > button#editMarker {
   > div.gm-style-iw.gm-style-iw-c
   > div.gm-style-iw-chr {
   height: 1em;
+}
+
+.info-window-content {
+  width: 25vw;
 }

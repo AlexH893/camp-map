@@ -1,9 +1,11 @@
 import { Loader } from "../node_modules/@googlemaps/js-api-loader/dist/index.mjs";
 import { addMarker, handleMarkerClick } from "./addMarker.js";
+export let currentInfoWindow = null;
 
 let map;
 window.markers = {};
 
+// Fetch the API key and load the Google Maps API
 fetch("/api/getApiKey")
   .then((response) => response.json())
   .then((data) => {
@@ -12,151 +14,27 @@ fetch("/api/getApiKey")
     const loader = new Loader({
       apiKey: apiKey,
       version: "weekly",
-      libraries: ["places"],
+      libraries: ["places", "marker"],
     });
 
-    // Initialize and add the map
-    let infoWindow;
-    window.addMarker = addMarker;
-
-    // Load the Google Maps API and initialize the map
     loader
-      .load()
-      .then(() => {
+      .importLibrary("maps")
+      .then(async () => {
+        // Load the AdvancedMarkerElement here before using it
+        const { AdvancedMarkerElement } = await google.maps.importLibrary(
+          "marker"
+        );
+        console.log("Google Maps API version:", google.maps.version);
+
+        // Now you can initialize the map
         map = new google.maps.Map(document.getElementById("map"), {
-          center: { lat: 39.85664657967366, lng: -105.3838304599834 }, // Example center coordinates
-          zoom: 12, // Example zoom level
+          center: { lat: 39.85664657967366, lng: -105.3838304599834 },
+          zoom: 12,
+          mapId: "DEMO_MAP_ID",
         });
 
-        if (map instanceof google.maps.Map) {
-          // Map is correctly initialized
-          loadMarkers();
-        } else {
-          console.error("Failed to initialize the map.");
-        }
-
-        // Define the bounds for the ground overlay
-        const bounds = new google.maps.LatLngBounds(
-          new google.maps.LatLng(39.62237, -105.486045), // Southwest corner of Colorado
-          new google.maps.LatLng(41.0, -102.041)
-        );
-
-        // The URL of the image to be used as overlay
-        const imageUrl = "./cellmap.png";
-
-        // Custom Overlay class extending google.maps.OverlayView
-        class CellOverlay extends google.maps.OverlayView {
-          constructor(bounds, image) {
-            super();
-            this.bounds = bounds;
-            this.image = image;
-            this.div = null;
-          }
-
-          onAdd() {
-            this.div = document.createElement("div");
-            this.div.style.borderStyle = "none";
-            this.div.style.borderWidth = "0px";
-            this.div.style.position = "absolute";
-
-            const img = document.createElement("img");
-            img.src = this.image;
-            img.style.width = "100%";
-            img.style.opacity = ".0";
-            img.style.height = "100%";
-            img.style.position = "absolute";
-            this.div.appendChild(img);
-
-            const panes = this.getPanes();
-            panes.overlayLayer.appendChild(this.div);
-          }
-
-          draw() {
-            const overlayProjection = this.getProjection();
-            const sw = overlayProjection.fromLatLngToDivPixel(
-              this.bounds.getSouthWest()
-            );
-            const ne = overlayProjection.fromLatLngToDivPixel(
-              this.bounds.getNorthEast()
-            );
-
-            if (this.div) {
-              this.div.style.left = sw.x + "px";
-              this.div.style.top = ne.y + "px";
-              this.div.style.width = ne.x - sw.x + "px";
-              this.div.style.height = sw.y - ne.y + "px";
-            }
-          }
-
-          onRemove() {
-            if (this.div) {
-              this.div.parentNode.removeChild(this.div);
-              this.div = null;
-            }
-          }
-
-          hide() {
-            if (this.div) {
-              this.div.style.visibility = "hidden";
-            }
-          }
-
-          show() {
-            if (this.div) {
-              this.div.style.visibility = "visible";
-            }
-          }
-
-          toggle() {
-            if (this.div) {
-              if (this.div.style.visibility === "hidden") {
-                this.show();
-              } else {
-                this.hide();
-              }
-            }
-          }
-
-          toggleDOM(map) {
-            if (this.getMap()) {
-              this.setMap(null);
-            } else {
-              if (map instanceof google.maps.Map) {
-                this.setMap(map);
-              } else {
-                console.error("Invalid map object passed to setMap.");
-              }
-            }
-          }
-        }
-
-        const overlay = new CellOverlay(bounds, imageUrl);
-        overlay.setMap(map);
-
-        infoWindow = new google.maps.InfoWindow();
-
-        // Add a button control to the map
-        const toggleButton = document.createElement("button");
-        toggleButton.textContent = "Toggle";
-        toggleButton.classList.add("custom-map-control-button");
-
-        const toggleDOMButton = document.createElement("button");
-        toggleDOMButton.textContent = "Toggle DOM Attachment";
-        toggleDOMButton.classList.add("custom-map-control-button");
-
-        toggleButton.addEventListener("click", () => {
-          overlay.toggle();
-        });
-
-        toggleDOMButton.addEventListener("click", () => {
-          overlay.toggleDOM(map);
-        });
-
-        // Adds the btns to map
-        map.controls[google.maps.ControlPosition.TOP_RIGHT].push(
-          toggleDOMButton
-        );
-        // map.controls[google.maps.ControlPosition.TOP_RIGHT].push(toggleButton);
+        // Pass the AdvancedMarkerElement to the loadMarkers function
+        loadMarkers(AdvancedMarkerElement);
 
         const locationButton = document.getElementById("locationButton");
         map.controls[google.maps.ControlPosition.BOTTOM_RIGHT].push(
@@ -210,7 +88,7 @@ fetch("/api/getApiKey")
             };
 
             markers.push(
-              new google.maps.Marker({
+              new AdvancedMarkerElement({
                 map,
                 icon,
                 title: place.name,
@@ -241,7 +119,7 @@ fetch("/api/getApiKey")
                 });
                 markers = [];
 
-                const marker = new google.maps.Marker({
+                const marker = new AdvancedMarkerElement({
                   position: pos,
                   map: map,
                   title: "Your Location",
@@ -259,7 +137,6 @@ fetch("/api/getApiKey")
             handleLocationError(false, infoWindow, map.getCenter());
           }
         });
-        loadMarkers();
       })
       .catch((error) => {
         console.error("Error loading Google Maps:", error);
@@ -268,6 +145,8 @@ fetch("/api/getApiKey")
   .catch((error) => {
     console.error("Error fetching API key:", error);
   });
+
+// Error handling function for location services
 function handleLocationError(browserHasGeolocation, infoWindow, pos) {
   const errorMessage = browserHasGeolocation
     ? "Error: The Geolocation service failed."
@@ -280,8 +159,8 @@ function handleLocationError(browserHasGeolocation, infoWindow, pos) {
   infoWindow.open(map);
 }
 
-// Loading markers
-export function loadMarkers() {
+// Loading markers with AdvancedMarkerElement
+export function loadMarkers(AdvancedMarkerElement) {
   fetch("/api/markers")
     .then((response) => response.json())
     .then((markersData) => {
@@ -290,20 +169,24 @@ export function loadMarkers() {
       window.markers = {};
 
       markersData.forEach((markerData) => {
-        const marker = new google.maps.Marker({
-          position: { lat: markerData.lat, lng: markerData.lng },
-          map: map,
-          title: markerData.name,
-          id: markerData.id,
-        });
+        try {
+          const marker = new AdvancedMarkerElement({
+            position: { lat: markerData.lat, lng: markerData.lng },
+            map: map,
+            title: markerData.name,
+            id: markerData.id,
+          });
 
-        // Store marker in the global markers object
-        window.markers[markerData.id] = marker;
+          // Store marker in the global markers object
+          window.markers[markerData.id] = marker;
+          console.log("loaded marker id(s): " + markerData.id);
+          marker.desc = markerData.desc;
 
-        marker.desc = markerData.desc;
-
-        // Attach click event for modal display
-        handleMarkerClick(marker);
+          // Attach click event for modal display
+          handleMarkerClick(marker, markerData.id);
+        } catch (error) {
+          console.error("Error creating marker:", error);
+        }
       });
     })
     .catch((error) => console.error("Error loading markers:", error));

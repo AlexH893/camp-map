@@ -2,26 +2,16 @@ div#requestedWeather {
   display: none;
 }
 
-h4 > button#editMarker {
-  margin-left: 0.5vw;
-}
-
 #fileInput {
   margin-bottom: 2vh;
 }
 
-.delete {
-  margin-left: 1vw;
-  width: 5vw;
-}
-
 #markerName {
   margin-top: 1em;
-}
-
-#weatherBtnTxt {
-  height: 0.3em;
-  margin-top: -0.1em;
+  margin: auto;
+  width: 50%;
+  text-align: center;
+  font-size: medium;
 }
 
 /* 
@@ -43,5 +33,32 @@ h4 > button#editMarker {
 }
 
 .info-window-content {
-  width: 25vw;
+  width: 40vw;
+}
+
+#markerInfo {
+  margin-top: 5em;
+  line-height: 0.2em;
+  font-size: 0.8em;
+}
+
+#buttons {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px;
+}
+
+#buttons button {
+  flex: 1;
+  padding: 1px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background-color: #f0f0f0;
+  cursor: pointer;
+}
+
+#buttons button:hover {
+  background-color: #aed08e;
 }

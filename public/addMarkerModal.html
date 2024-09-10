@@ -10,31 +10,43 @@
   </head>
   <body>
     <div id="modalContainer" class="info-window-content">
-      <h4>Add a marker</h4>
+      <h3 id="add">Add a marker</h3>
 
-      <button
-        id="getWeather"
-        onclick="console.log(window.selectedLatLng); getWeather(window.selectedLatLng.lat, window.selectedLatLng.lng)"
-      >
-        <p id="weatherBtnTxt">Get Weather</p>
-      </button>
+      <div class="input-container">
+        <input id="name" autocomplete="off" placeholder=" " />
+        <label for="name">Marker Name</label>
+      </div>
+      <div class="desc-container">
+        <input id="desc" placeholder="" autocomplete="off" maxlength="50" />
+        <label for="desc">Description</label>
+      </div>
       <div id="weatherResponse"></div>
-      <div id="geoInfo">
-        <p><!-- ELEVATION_PLACEHOLDER --></p>
-        <p>
-          <!-- LATITUDE_PLACEHOLDER -->
-          <!-- LATITUDE_PLACEHOLDER -->
-        </p>
-        <p>
-          <!-- LONGITUDE_PLACEHOLDER -->
-          <!-- LONGITUDE_PLACEHOLDER -->
-        </p>
+      <div id="markerInfo">
+        <div id="geoInfo">
+          <p><!-- ELEVATION_PLACEHOLDER --></p>
+          <p>
+            <!-- LATITUDE_PLACEHOLDER -->
+            <!-- LATITUDE_PLACEHOLDER -->
+          </p>
+          <p>
+            <!-- LONGITUDE_PLACEHOLDER -->
+            <!-- LONGITUDE_PLACEHOLDER -->
+          </p>
+        </div>
       </div>
 
-      <input id="name" required placeholder="Marker name" autofocus /> <br />
-      <input id="desc" placeholder="Description" maxlength="30" /> <br />
-      <button id="submit-button" name="submit">Submit</button>
-      <button name="close" class="close" onclick="deleteAddition();">X</button>
+      <div id="buttons">
+        <button
+          id="getWeather"
+          onclick="console.log(window.selectedLatLng); getWeather(window.selectedLatLng.lat, window.selectedLatLng.lng)"
+        >
+          Get Weather
+        </button>
+        <button id="submit-button" name="submit">Submit</button>
+        <button name="close" class="close" onclick="deleteAddition();">
+          X
+        </button>
+      </div>
     </div>
     <script type="module" src="./addMarker.js"></script>
     <script type="module" src="./getWeather.js"></script>

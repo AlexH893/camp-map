@@ -9,31 +9,37 @@
     <div class="info-window-content">
       <h4 id="markerName"><!-- NAME_PLACEHOLDER --></h4>
       <p id="markerDesc"><!-- DESCRIPTION_PLACEHOLDER --></p>
-
       <div id="weatherResponse"></div>
-      <div id="geoInfo">
-        <p><!-- ELEVATION_PLACEHOLDER --></p>
-        <p><!-- LATITUDE_PLACEHOLDER --></p>
-        <p><!-- LONGITUDE_PLACEHOLDER --></p>
+      <div id="markerInfo">
+        <div id="geoInfo">
+          <p><!-- ELEVATION_PLACEHOLDER --></p>
+          <p><!-- LATITUDE_PLACEHOLDER --></p>
+          <p><!-- LONGITUDE_PLACEHOLDER --></p>
+        </div>
+        <p id="date_created">
+          Created:
+          <!-- DATE_CREATED_PLACEHOLDER -->
+        </p>
       </div>
+      <div id="buttons">
+        <button class="edit" data-id="<!-- DYNAMIC_ID -->">Edit</button>
 
-      <button class="edit" data-id="<!-- DYNAMIC_ID -->">Edit</button>
+        <button
+          id="getWeather"
+          onclick="window.getWeather(window.selectedLatLng.lat, window.selectedLatLng.lng)"
+        >
+          <p id="weatherBtnTxt">Get Weather</p>
+        </button>
 
-      <button
-        id="getWeather"
-        onclick="window.getWeather(window.selectedLatLng.lat, window.selectedLatLng.lng)"
-      >
-        <p id="weatherBtnTxt">Get Weather</p>
-      </button>
-
-      <button
-        name="delete"
-        class="delete"
-        data-id="<!-- DYNAMIC_ID2 -->"
-        onclick="window.handleDelete(this)"
-      >
-        Delete
-      </button>
+        <button
+          name="delete"
+          class="delete"
+          data-id="<!-- DYNAMIC_ID2 -->"
+          onclick="window.handleDelete(this)"
+        >
+          Delete
+        </button>
+      </div>
     </div>
     <script type="module" src="./editMarker.js"></script>
   </body>

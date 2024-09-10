@@ -12,8 +12,15 @@
           >×</span
         >
         <h4>Edit Marker</h4>
-        <input id="name" placeholder="Marker name" />
-        <input id="desc" placeholder="Description" maxlength="30" />
+        <div class="input-container">
+          <input id="name" placeholder=" " autocomplete="off"/>
+          <label for="name">Marker Name</label>
+        </div>
+
+        <div class="desc-container">
+          <input id="desc" placeholder="Description" maxlength="30" autocomplete="off"/>
+          <label for="desc">Description</label>
+        </div>
         <div id="coords">
           <ul>
             <li><strong>Latitude:</strong> <span id="lat"></span></li>
@@ -21,7 +28,9 @@
             <li><strong>Elevation:</strong> <span id="elevation"></span></li>
           </ul>
         </div>
-        <button id="submit" data-id="markerId">Submit</button>
+        <div id="buttons">
+          <button id="submit" data-id="markerId">Submit</button>
+        </div>
       </div>
     </div>
   </body>

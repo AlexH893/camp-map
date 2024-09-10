@@ -177,13 +177,15 @@ export function loadMarkers(AdvancedMarkerElement) {
             id: markerData.id,
           });
 
+          const dateCreated = markerData.date_created;
+
           // Store marker in the global markers object
           window.markers[markerData.id] = marker;
           console.log("loaded marker id(s): " + markerData.id);
           marker.desc = markerData.desc;
 
           // Attach click event for modal display
-          handleMarkerClick(marker, markerData.id);
+          handleMarkerClick(marker, markerData.id, dateCreated);
         } catch (error) {
           console.error("Error creating marker:", error);
         }

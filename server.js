@@ -1,3 +1,6 @@
+const multer = require("multer");
+const upload = multer({ dest: "uploads/" });
+
 const express = require("express");
 const sqlite = require("sqlite3");
 
@@ -66,6 +69,30 @@ app.get("/api/currentTemp", (req, res) => {
   });
 });
 
+app.post("/upload", upload.single("image"), (req, res) => {
+  if (!req.file) {
+    return res.status(400).send("No file uploaded.");
+  }
+
+  const imageUrl = `/uploads/${req.file.filename}`;
+
+  // Assuming you have a marker ID or other identifier to associate with the image
+  const markerId = req.body.markerId; // or however you pass the marker ID
+
+  // Save the image URL in the database associated with the marker
+  const query = `UPDATE camp_locations SET image_url = ? WHERE id = ?`;
+  const params = [imageUrl, markerId];
+
+  db.run(query, params, function (err) {
+    if (err) {
+      console.error("Error updating marker with image URL:", err.message);
+      return res.status(500).json({ error: err.message });
+    } else {
+      res.json({ imageUrl });
+    }
+  });
+});
+
 // Serve static files from the 'public' directory
 app.use(express.static(path.join(__dirname, "public")));
 app.use("/node_modules", express.static(path.join(__dirname, "node_modules")));
@@ -80,11 +107,11 @@ app.use((req, res, next) => {
 
 // Route to create a marker
 app.post("/api/add-marker", (req, res) => {
-  const { name, desc, lat, lng, elevation } = req.body;
+  const { name, desc, lat, lng, elevation, date_created } = req.body;
 
   const query =
-    "INSERT into camp_locations (name, desc, lat, lng, elevation) VALUES (?,?,?,?,?)";
-  const params = [name, desc, lat, lng, elevation];
+    "INSERT into camp_locations (name, desc, lat, lng, elevation, date_created) VALUES (?,?,?,?,?,CURRENT_TIMESTAMP)";
+  const params = [name, desc, lat, lng, elevation, date_created];
 
   db.run(query, params, function (err) {
     if (err) {

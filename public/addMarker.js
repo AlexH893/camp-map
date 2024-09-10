@@ -22,7 +22,8 @@ export function updateContent(
   latLong,
   name,
   desc,
-  markerId
+  markerId,
+  date_created
 ) {
   const updatedContent = content
     .replace(
@@ -40,7 +41,9 @@ export function updateContent(
     .replace(/<!-- NAME_PLACEHOLDER -->/, name || "No Name")
     .replace(/<!-- DESCRIPTION_PLACEHOLDER -->/, desc || "No description")
     .replace(/<!-- DYNAMIC_ID -->/, markerId || "")
-    .replace(/<!-- DYNAMIC_ID2 -->/, markerId || "");
+    .replace(/<!-- DYNAMIC_ID2 -->/, markerId || "")
+    .replace(/<!-- DATE_CREATED_PLACEHOLDER -->/, date_created || "");
+
   console.log("Marker ID: " + markerId + " Name: " + name);
   return updatedContent;
 }
@@ -52,7 +55,8 @@ async function submitMarker(
   lng,
   elevationInFeet,
   infoWindow,
-  AdvancedMarkerElement
+  AdvancedMarkerElement,
+  date_created
 ) {
   try {
     const response = await fetch("/api/add-marker", {
@@ -170,7 +174,7 @@ export async function addMarker(map) {
   }
 }
 
-export async function handleMarkerClick(marker, markerId) {
+export async function handleMarkerClick(marker, markerId, date_created) {
   marker.addListener("click", async () => {
     try {
       const position = marker.position;
@@ -194,7 +198,8 @@ export async function handleMarkerClick(marker, markerId) {
         latLong,
         marker.title,
         marker.desc || "No description",
-        markerId
+        markerId,
+        date_created
       );
       console.log("Displaying info window for marker ID:", markerId);
 
@@ -213,6 +218,8 @@ export async function handleMarkerClick(marker, markerId) {
 
       setTimeout(() => {
         const editButton = document.querySelector(".edit");
+
+
         if (editButton) {
           editButton.addEventListener("click", async (event) => {
             event.preventDefault();

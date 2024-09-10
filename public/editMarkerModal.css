@@ -9,6 +9,7 @@
   padding: 20px;
   border-radius: 10px;
   z-index: 1000;
+  width: 30vw;
 }
 
 #editModalContainer.show {
@@ -32,7 +33,7 @@
 
 #coords strong {
   display: inline-block;
-  width: 100px; /* Adjust width as needed */
+  width: 100px;
 }
 
 .close {
@@ -40,4 +41,77 @@
   top: 10px; /* Distance from top of the modal */
   right: 10px; /* Distance from right of the modal */
   cursor: pointer;
+}
+
+#buttons {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px;
+  height: 2em;
+}
+
+#buttons button {
+  flex: 1;
+  padding: 4px;
+  font-size: 14px;
+  border: 1px solid #ccc; /* Add border to buttons */
+  border-radius: 4px; /* Rounded corners */
+  background-color: #f0f0f0; /* Button background color */
+  cursor: pointer; /* Show pointer cursor on hover */
+}
+
+#buttons button:hover {
+  background-color: #aed08e; /* Change background on hover */
+}
+
+.input-container,
+.desc-container {
+  position: relative;
+  width: 100%;
+}
+.input-container {
+  margin-bottom: 2em;
+}
+
+input#name,
+input#desc {
+  width: 80%;
+  padding: 12px;
+  border: #aaa;
+  border-bottom: 2px solid #ccc;
+  font-size: 16px;
+  outline: none;
+  background: transparent;
+  transition: border-color 0.3s ease;
+}
+
+input#name:focus {
+  border-color: #007bff;
+}
+
+label {
+  position: absolute;
+  top: 50%;
+  left: 12px;
+  transform: translateY(-50%);
+  font-size: 16px;
+  color: #aaa;
+  transition: top 0.3s ease, font-size 0.3s ease, color 0.3s ease;
+}
+
+input#name:focus + label,
+input#name:not(:placeholder-shown) + label {
+  top: -10px;
+  font-size: 12px;
+  color: #007bff;
+}
+input#desc:focus + label,
+input#desc:not(:placeholder-shown) + label {
+  top: -10px;
+  font-size: 12px;
+  color: #007bff;
+}
+h4 {
+  text-align: center;
 }

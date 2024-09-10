@@ -94,5 +94,91 @@
 }
 
 #desc {
-  margin-bottom: 1em;
+  margin-bottom: -0.5em;
+}
+
+#buttons {
+  display: flex;
+  justify-content: space-between; /* Space out the buttons evenly */
+  gap: 10px; /* Optional: Adjust space between buttons if needed */
+  padding: 10px; /* Optional: Adjust padding around the container */
+}
+
+#buttons button {
+  flex: 1; /* Make buttons take up equal space */
+  padding: 4px; /* Adjust padding to make the buttons shorter in height */
+  font-size: 14px; /* Optional: Adjust font size for a smaller button */
+  border: 1px solid #ccc; /* Optional: Add border to buttons */
+  border-radius: 4px; /* Optional: Rounded corners */
+  background-color: #f0f0f0; /* Optional: Button background color */
+  cursor: pointer; /* Show pointer cursor on hover */
+}
+
+#buttons button:hover {
+  background-color: #aed08e; /* Optional: Change background on hover */
+}
+.info-window-content {
+  width: 30vw;
+}
+
+#markerInfo {
+  margin-top: 5em;
+  line-height: 0.2em;
+  font-size: 0.8em;
+}
+
+.input-container,
+.desc-container {
+  position: relative;
+  width: 100%;
+}
+.input-container {
+  margin-bottom: 2em;
+}
+
+input#name,
+input#desc {
+  width: 80%;
+  padding: 12px;
+  border: #aaa;
+  border-bottom: 2px solid #ccc;
+  font-size: 16px;
+  outline: none;
+  background: transparent;
+  transition: border-color 0.3s ease;
+}
+
+input#name:focus {
+  border-color: #007bff;
+}
+
+label {
+  position: absolute;
+  top: 50%;
+  left: 12px;
+  transform: translateY(-50%);
+  font-size: 16px;
+  color: #aaa;
+  transition: top 0.3s ease, font-size 0.3s ease, color 0.3s ease;
+}
+
+input#name:focus + label,
+input#name:not(:placeholder-shown) + label {
+  top: -10px;
+  font-size: 12px;
+  color: #007bff;
+}
+input#desc:focus + label,
+input#desc:not(:placeholder-shown) + label {
+  top: -10px;
+  font-size: 12px;
+  color: #007bff;
+}
+
+#weatherResponse {
+  margin-top: 1em;
+  margin-bottom: -1em;
+}
+h3#add {
+  text-align: center;
 }

@@ -105,6 +105,8 @@ fetch("/api/getApiKey")
           map.fitBounds(bounds);
         });
 
+        const infoWindow = new google.maps.InfoWindow();
+
         locationButton.addEventListener("click", () => {
           if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(

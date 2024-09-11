@@ -23,6 +23,25 @@ export async function loadEditModal() {
   }
 }
 
+// Function to detect if click is outside the modal and close it
+function outsideClickListener(event) {
+  const modalContainer = document.getElementById("editModalContainer");
+  if (modalContainer && !modalContainer.contains(event.target)) {
+    closeModal();
+    removeClickListener(); // Remove the event listener after modal is closed
+  }
+}
+
+// Add the event listener to close modal on outside click
+function addClickListener() {
+  document.addEventListener("click", outsideClickListener);
+}
+
+// Remove the event listener
+function removeClickListener() {
+  document.removeEventListener("click", outsideClickListener);
+}
+
 // Handle the edit button click
 export async function handleEdit(button) {
   // Ensure the modal is loaded
@@ -36,7 +55,6 @@ export async function handleEdit(button) {
   }
 
   // Get the marker ID from the button's data-id attribute
-
   markerId = button.getAttribute("data-id");
 
   // Display the modal
@@ -47,18 +65,10 @@ export async function handleEdit(button) {
   if (submitButton) {
     submitButton.setAttribute("data-id", markerId);
 
-    // console.log("Submit button element found:", submitButton);
-
-    // console.log(
-    //   "Submit button data-id set to:",
-    //   submitButton.getAttribute("data-id")
-    // );
-
     // Remove old listener if it exists and add a new listener
     submitButton.removeEventListener("click", handleSubmit);
     submitButton.addEventListener("click", async () => {
       const markerId = submitButton.getAttribute("data-id");
-      // console.log("Submit button clicked. Marker ID:", markerId);
 
       if (markerId) {
         try {
@@ -79,6 +89,18 @@ export async function handleEdit(button) {
     await fetchContent(markerId);
   } catch (error) {
     console.error("Error fetching content for marker ID:", markerId, error);
+  }
+
+  // Add click listener for closing modal when clicking outside
+  addClickListener();
+}
+
+// Hide the modal
+export function closeModal() {
+  const modalContainer = document.getElementById("editModalContainer");
+  if (modalContainer) {
+    modalContainer.style.display = "none";
+    removeClickListener(); // Remove the listener when modal is closed
   }
 }
 
@@ -126,22 +148,6 @@ export async function fetchContent(markerId) {
     console.error("Error fetching marker data:", error);
   }
 }
-
-// Hide the modal
-export function closeModal() {
-  const modalContainer = document.getElementById("editModalContainer");
-  if (modalContainer) {
-    modalContainer.style.display = "none";
-  }
-}
-
-// Close the modal when clicking outside of it
-window.onclick = function (event) {
-  const modalContainer = document.getElementById("editModalContainer");
-  if (event.target === modalContainer) {
-    closeModal();
-  }
-};
 
 // Submit edited marker data
 export async function editMarker(markerId, AdvancedMarkerElement) {

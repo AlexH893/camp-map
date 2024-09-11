@@ -32,8 +32,9 @@ export async function deleteMarker(id) {
         marker.setMap(null);
         // Remove it from the markers object
         delete window.markers[id];
+
         // Refresh markers
-        await loadMarkers();
+        await loadMarkers(google.maps.marker.AdvancedMarkerElement);
       } else {
         console.warn("Marker not found in markers object");
       }

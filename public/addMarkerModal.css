@@ -182,3 +182,7 @@ input#desc:not(:placeholder-shown) + label {
 h3#add {
   text-align: center;
 }
+
+.gm-ui-hover-effect {
+  display: none !important;
+}

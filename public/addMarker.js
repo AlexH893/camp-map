@@ -138,14 +138,25 @@ export async function addMarker(map) {
 
         infoWindow.open({ anchor: marker, map, shouldFocus: false });
 
+
+
         setTimeout(() => {
           const submitButton = document.getElementById("submit-button");
           if (submitButton) {
             submitButton.addEventListener("click", () => {
               const nameInput = document.getElementById("name");
+
+              // Validate input
+              if (!nameInput.value.trim()) {
+                alert("Name is required");
+                nameInput.focus();
+                return; // Exit the function if validation fails
+              }
+
               const descInput = document.getElementById("desc");
 
               const name = nameInput ? nameInput.value : "Unnamed Marker";
+              
               const desc = descInput ? descInput.value : "No description";
 
               submitMarker(
@@ -176,6 +187,15 @@ export async function addMarker(map) {
 
 export async function handleMarkerClick(marker, markerId, date_created) {
   marker.addListener("click", async () => {
+    // Disable clicking an existing marker if inSelectionMode
+    if (inSelectionMode) {
+      return;
+    }
+
+    // Close the currently open InfoWindow if it exists
+    if (currentInfoWindow) {
+      currentInfoWindow.close();
+    }
     try {
       const position = marker.position;
       const lat = position.lat;
@@ -185,11 +205,7 @@ export async function handleMarkerClick(marker, markerId, date_created) {
 
       const { elevationInFeet, latLong } = await getElevation(lat, lng);
 
-      if (currentInfoWindow) {
-        currentInfoWindow.close();
-        currentInfoWindow = null;
-      }
-
+      // Fetch content for the InfoWindow
       let contentUrl = "markerModal.html";
       let content = await fetchContent(contentUrl);
       content = updateContent(
@@ -201,8 +217,12 @@ export async function handleMarkerClick(marker, markerId, date_created) {
         markerId,
         date_created
       );
+
+      
+
       console.log("Displaying info window for marker ID:", markerId);
 
+      // Create and open the InfoWindow
       const infoWindow = new google.maps.InfoWindow({
         content: content,
         ariaLabel: "Marker Information",
@@ -216,9 +236,17 @@ export async function handleMarkerClick(marker, markerId, date_created) {
 
       currentInfoWindow = infoWindow;
 
+      // Close InfoWindow when clicking outside on the map
+      marker.map.addListener("click", () => {
+        if (currentInfoWindow) {
+          currentInfoWindow.close();
+          currentInfoWindow = null;
+        }
+      });
+
+      // Add the click listener for the edit button
       setTimeout(() => {
         const editButton = document.querySelector(".edit");
-
 
         if (editButton) {
           editButton.addEventListener("click", async (event) => {

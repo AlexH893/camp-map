@@ -62,3 +62,17 @@ div#requestedWeather {
 #buttons button:hover {
   background-color: #aed08e;
 }
+#imageContainer {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  height: 28vh;
+}
+
+#imageContainer .image {
+  width: 90%;
+  height: 25vh;
+}
+#imageForm {
+  margin-top: 3em;
+}

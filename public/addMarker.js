@@ -23,7 +23,8 @@ export function updateContent(
   name,
   desc,
   markerId,
-  date_created
+  date_created,
+  imageUrl
 ) {
   const updatedContent = content
     .replace(
@@ -42,7 +43,13 @@ export function updateContent(
     .replace(/<!-- DESCRIPTION_PLACEHOLDER -->/, desc || "No description")
     .replace(/<!-- DYNAMIC_ID -->/, markerId || "")
     .replace(/<!-- DYNAMIC_ID2 -->/, markerId || "")
-    .replace(/<!-- DATE_CREATED_PLACEHOLDER -->/, date_created || "");
+    .replace(/<!-- DATE_CREATED_PLACEHOLDER -->/, date_created || "")
+    .replace(
+      /<!-- IMAGE_PLACEHOLDER -->/,
+      imageUrl
+        ? `<img src="${imageUrl}" alt="Marker Image"  class="image">`
+        : "No image available"
+    );
 
   console.log("Marker ID: " + markerId + " Name: " + name);
   return updatedContent;
@@ -56,7 +63,8 @@ async function submitMarker(
   elevationInFeet,
   infoWindow,
   AdvancedMarkerElement,
-  date_created
+  date_created,
+  imageUrl
 ) {
   try {
     const response = await fetch("/api/add-marker", {
@@ -70,6 +78,7 @@ async function submitMarker(
         lat,
         lng,
         elevation: elevationInFeet,
+        imageUrl,
       }),
     });
 
@@ -138,7 +147,7 @@ export async function addMarker(map) {
 
         infoWindow.open({ anchor: marker, map, shouldFocus: false });
 
-
+        currentInfoWindow = infoWindow;
 
         setTimeout(() => {
           const submitButton = document.getElementById("submit-button");
@@ -146,18 +155,18 @@ export async function addMarker(map) {
             submitButton.addEventListener("click", () => {
               const nameInput = document.getElementById("name");
 
-              // Validate input
               if (!nameInput.value.trim()) {
                 alert("Name is required");
                 nameInput.focus();
-                return; // Exit the function if validation fails
+                return;
               }
 
               const descInput = document.getElementById("desc");
-
               const name = nameInput ? nameInput.value : "Unnamed Marker";
-              
               const desc = descInput ? descInput.value : "No description";
+              const imageUrl =
+                document.getElementById("imageContainer")?.querySelector("img")
+                  ?.src || "";
 
               submitMarker(
                 name,
@@ -166,7 +175,8 @@ export async function addMarker(map) {
                 window.selectedLatLng.lng,
                 elevationInFeet,
                 infoWindow,
-                google.maps.marker.AdvancedMarkerElement
+                google.maps.marker.AdvancedMarkerElement,
+                imageUrl
               );
 
               marker.desc = desc;
@@ -187,12 +197,10 @@ export async function addMarker(map) {
 
 export async function handleMarkerClick(marker, markerId, date_created) {
   marker.addListener("click", async () => {
-    // Disable clicking an existing marker if inSelectionMode
     if (inSelectionMode) {
       return;
     }
 
-    // Close the currently open InfoWindow if it exists
     if (currentInfoWindow) {
       currentInfoWindow.close();
     }
@@ -205,9 +213,13 @@ export async function handleMarkerClick(marker, markerId, date_created) {
 
       const { elevationInFeet, latLong } = await getElevation(lat, lng);
 
-      // Fetch content for the InfoWindow
       let contentUrl = "markerModal.html";
       let content = await fetchContent(contentUrl);
+
+      // Fetch marker data from API or your data source
+      const response = await fetch(`/api/markers/${markerId}`);
+      const markerData = await response.json();
+
       content = updateContent(
         content,
         elevationInFeet,
@@ -215,14 +227,12 @@ export async function handleMarkerClick(marker, markerId, date_created) {
         marker.title,
         marker.desc || "No description",
         markerId,
-        date_created
+        date_created,
+        markerData.imageUrl
       );
-
-      
 
       console.log("Displaying info window for marker ID:", markerId);
 
-      // Create and open the InfoWindow
       const infoWindow = new google.maps.InfoWindow({
         content: content,
         ariaLabel: "Marker Information",
@@ -236,7 +246,6 @@ export async function handleMarkerClick(marker, markerId, date_created) {
 
       currentInfoWindow = infoWindow;
 
-      // Close InfoWindow when clicking outside on the map
       marker.map.addListener("click", () => {
         if (currentInfoWindow) {
           currentInfoWindow.close();
@@ -244,7 +253,6 @@ export async function handleMarkerClick(marker, markerId, date_created) {
         }
       });
 
-      // Add the click listener for the edit button
       setTimeout(() => {
         const editButton = document.querySelector(".edit");
 
@@ -264,6 +272,57 @@ export async function handleMarkerClick(marker, markerId, date_created) {
         } else {
           console.error("Edit button not found in the modal content.");
         }
+
+        const uploadButton = document.getElementById("uploadButton");
+        if (uploadButton) {
+          uploadButton.addEventListener("click", async (event) => {
+            event.preventDefault();
+            console.log("Upload button clicked");
+
+            const fileInput = document.getElementById("fileUpload");
+            const file = fileInput.files[0];
+
+            if (!file) {
+              alert("Please select a JPG file to upload.");
+              return;
+            }
+
+            const formData = new FormData();
+            formData.append("image", file);
+            formData.append("markerId", markerId);
+
+            try {
+              const response = await fetch("/upload", {
+                method: "POST",
+                body: formData,
+              });
+
+              const result = await response.json();
+
+              if (response.ok) {
+                document.getElementById("uploadStatus").innerText =
+                  "Image uploaded successfully!";
+                console.log("Image URL:", result.imageUrl);
+
+                const imageContainer =
+                  document.getElementById("imageContainer");
+                if (imageContainer) {
+                  imageContainer.innerHTML = `<img src="${result.imageUrl}" alt="Uploaded Image" style="max-width: 100%; height: auto;">`;
+                }
+              } else {
+                document.getElementById("uploadStatus").innerText =
+                  "Failed to upload image.";
+                console.error("Upload error:", result.error);
+              }
+            } catch (error) {
+              console.error("Error during file upload:", error);
+              document.getElementById("uploadStatus").innerText =
+                "An error occurred during upload.";
+            }
+          });
+        } else {
+          console.error("Upload button not found.");
+        }
       }, 100);
     } catch (error) {
       console.error("Error displaying marker modal:", error);
@@ -271,7 +330,6 @@ export async function handleMarkerClick(marker, markerId, date_created) {
   });
 }
 
-// Deletes current infoWindow if user adds but hasn't submitted
 export async function deleteAddition() {
   if (currentInfoWindow) {
     currentInfoWindow.close();
@@ -282,7 +340,6 @@ export async function deleteAddition() {
   toggleButtonState();
 }
 
-// Toggle state of add marker btn
 export async function toggleButtonState() {
   const addMarkerButton = document.getElementById("addMarkerButton");
 
@@ -295,7 +352,6 @@ export async function toggleButtonState() {
   }
 }
 
-// Gets elevation
 async function getElevation(lat, lng) {
   const elevationUrl = `http://localhost:3000/api/elevation?lat=${lat}&lng=${lng}`;
   try {

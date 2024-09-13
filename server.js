@@ -1,21 +1,30 @@
-const multer = require("multer");
-const upload = multer({ dest: "uploads/" });
+import express from "express";
+import { fileURLToPath } from "url";
+import multer from "multer";
+import axios from "axios";
+import FormData from "form-data";
+import sqlite from "sqlite3";
+import cors from "cors";
+import dotenv from "dotenv";
+import request from "request";
+import path from "path";
 
-const express = require("express");
-const sqlite = require("sqlite3");
+// Define __filename and __dirname
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
-const cors = require("cors");
-const dotenv = require("dotenv");
+// Configure multer to use memory storage
+const storage = multer.memoryStorage();
+const upload = multer({ storage: storage });
+
 dotenv.config();
 
-const request = require("request");
 const app = express();
-const path = require("path");
 
 app.use(cors());
 app.use(express.json());
 
-const port = 3000;
+const port = process.env.PORT || 3000;
 let apiKey = process.env.API_KEY;
 
 // Initialize and configure the sqlite3 instance
@@ -31,11 +40,9 @@ const db = new sqlite.Database("./mydb.sqlite", (err) => {
 
 app.get("/api/elevation", (req, res) => {
   const { lat, lng } = req.query;
-  // console.log(`Received request for elevation data: lat=${lat}, lng=${lng}`);
 
   // Construct the correct URL for the Google Elevation API
   const elevationUrl = `https://maps.googleapis.com/maps/api/elevation/json?locations=${lat},${lng}&key=${apiKey}`;
-  // console.log(`Requesting elevation data from: ${elevationUrl}`);
 
   request(elevationUrl, function (error, response, body) {
     if (error) {
@@ -50,7 +57,7 @@ app.get("/api/elevation", (req, res) => {
   });
 });
 
-app.get("/api/currentTemp", (req, res) => {
+app.get("/currentTemp", (req, res) => {
   const { lat, lng } = req.query;
 
   const currTempUrl =
@@ -69,28 +76,51 @@ app.get("/api/currentTemp", (req, res) => {
   });
 });
 
-app.post("/upload", upload.single("image"), (req, res) => {
+app.post("/upload", upload.single("image"), async (req, res) => {
   if (!req.file) {
     return res.status(400).send("No file uploaded.");
   }
 
-  const imageUrl = `/uploads/${req.file.filename}`;
+  try {
+    console.log(req.file); // Debugging line
 
-  // Assuming you have a marker ID or other identifier to associate with the image
-  const markerId = req.body.markerId; // or however you pass the marker ID
+    const form = new FormData();
+    // Converting file buffer to base64
+    form.append("image", req.file.buffer.toString("base64"));
+    form.append("key", "2a349d17e6d9e364ae745c226c5f7b86");
 
-  // Save the image URL in the database associated with the marker
-  const query = `UPDATE camp_locations SET image_url = ? WHERE id = ?`;
-  const params = [imageUrl, markerId];
+    // Send the image to Imgbb
+    const response = await axios.post("https://api.imgbb.com/1/upload", form, {
+      headers: {
+        ...form.getHeaders(),
+      },
+    });
 
-  db.run(query, params, function (err) {
-    if (err) {
-      console.error("Error updating marker with image URL:", err.message);
-      return res.status(500).json({ error: err.message });
-    } else {
-      res.json({ imageUrl });
+    console.log(response.data); // Log response data for debugging
+    const imageUrl = response.data.data.url;
+
+    if (!imageUrl) {
+      throw new Error("Image URL is undefined in response");
     }
-  });
+
+    const markerId = req.body.markerId;
+
+    // Save the image URL in the database associated with the marker
+    const query = `UPDATE camp_locations SET imageUrl = ? WHERE id = ?`;
+    const params = [imageUrl, markerId];
+
+    db.run(query, params, function (err) {
+      if (err) {
+        console.error("Error updating marker with image URL:", err.message);
+        return res.status(500).json({ error: err.message });
+      } else {
+        res.json({ imageUrl });
+      }
+    });
+  } catch (err) {
+    console.error("Error uploading image to Imgbb:", err.message);
+    res.status(500).json({ error: "Failed to upload image." });
+  }
 });
 
 // Serve static files from the 'public' directory
@@ -107,17 +137,44 @@ app.use((req, res, next) => {
 
 // Route to create a marker
 app.post("/api/add-marker", (req, res) => {
-  const { name, desc, lat, lng, elevation, date_created } = req.body;
+  const { name, desc, lat, lng, elevation, date_created, imageUrl } = req.body;
+
+  // Log the incoming request body
+  console.log("Received request to add marker with data:", {
+    name,
+    desc,
+    lat,
+    lng,
+    elevation,
+    date_created,
+    imageUrl,
+  });
 
   const query =
-    "INSERT into camp_locations (name, desc, lat, lng, elevation, date_created) VALUES (?,?,?,?,?,CURRENT_TIMESTAMP)";
-  const params = [name, desc, lat, lng, elevation, date_created];
+    "INSERT into camp_locations (name, desc, lat, lng, elevation, date_created, imageUrl) VALUES (?,?,?,?,?,?,?)";
+  const params = [name, desc, lat, lng, elevation, date_created, imageUrl];
+
+  // Log the SQL query and parameters
+  console.log("Executing query:", query);
+  console.log("With parameters:", params);
 
   db.run(query, params, function (err) {
     if (err) {
-      res.status(500).json({ error: err.message });
+      // Log error message
+      console.error("Error inserting marker into database:", err.message);
+
+      // Send error response and return immediately to prevent further execution
+      return res.status(500).json({ error: "Failed to add marker" });
     } else {
-      res.json({ message: "Marker added successfully", id: this.lastID });
+      // Log the ID of the newly created marker
+      console.log("Marker added successfully with ID:", this.lastID);
+
+      // Send success response
+      res.json({
+        message: "Marker added successfully",
+        id: this.lastID,
+        imageUrl,
+      });
     }
   });
 });
@@ -213,3 +270,4 @@ app.get("/api/getApiKey", (req, res) => {
 app.listen(port, "::", () => {
   console.log(`Server running at http://[::]:${port}/`);
 });
+export default app;

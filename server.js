@@ -87,7 +87,7 @@ app.post("/upload", upload.single("image"), async (req, res) => {
     const form = new FormData();
     // Converting file buffer to base64
     form.append("image", req.file.buffer.toString("base64"));
-    form.append("key", "2a349d17e6d9e364ae745c226c5f7b86");
+    form.append("key", "key");
 
     // Send the image to Imgbb
     const response = await axios.post("https://api.imgbb.com/1/upload", form, {

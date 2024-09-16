@@ -144,6 +144,25 @@ export async function fetchContent(markerId) {
     document.getElementById("lat").innerText = markerData.lat || "";
     document.getElementById("lng").innerText = markerData.lng || "";
     document.getElementById("elevation").innerText = markerData.elevation || "";
+
+    // Handling the image display
+    const imageContainer = document.getElementById("imageContainer");
+    const deleteButton = document.getElementById("deleteImageButton");
+    if (imageContainer && markerData.imageUrl) {
+      imageContainer.innerHTML = `
+        <img src="${markerData.imageUrl}" alt="Uploaded Image" style="max-width: 100%; height: auto;">
+        <button id="deleteImageButton">X</button>
+      `;
+      // Adding an event listener to delete the image
+      document
+        .getElementById("deleteImageButton")
+        .addEventListener("click", async () => {
+         console.log("test");
+          await deleteImage(markerId);
+        });
+    } else {
+      imageContainer.innerHTML = "";
+    }
   } catch (error) {
     console.error("Error fetching marker data:", error);
   }
@@ -175,6 +194,26 @@ export async function editMarker(markerId, AdvancedMarkerElement) {
     }
   } catch (error) {
     console.error("Error updating marker:", error);
+  }
+}
+
+async function deleteImage(markerId) {
+  try {
+    const response = await fetch(`/api/delete-image/${markerId}`, {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+    });
+
+    if (response.ok) {
+      console.log("img deletion success");
+      // Removing img from modal
+      const imageContainer = document.getElementById("imageContainer");
+      imageContainer.innerHTML = "No Image";
+    } else {
+      console.error("Failed to delete image");
+    }
+  } catch {
+    console.error("Failed to delete iamge", error);
   }
 }
 

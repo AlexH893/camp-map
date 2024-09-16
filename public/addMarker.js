@@ -47,12 +47,23 @@ export function updateContent(
     .replace(
       /<!-- IMAGE_PLACEHOLDER -->/,
       imageUrl
-        ? `<img src="${imageUrl}" alt="Marker Image"  class="image">`
-        : "No image available"
+        ? `<img src="${imageUrl}" alt="Marker Image" class="image" style="display: block;   justify-content: center;
+  align-items: flex-start;
+  height: 28vh;">`
+        : ""
     );
 
   console.log("Marker ID: " + markerId + " Name: " + name);
   return updatedContent;
+}
+
+// Function to manipulate the DOM after content is rendered
+export function handleImageDisplay(imageUrl) {
+  const imageContainer = document.getElementById("imageContainer");
+  if (imageContainer) {
+    imageContainer.style.display = imageUrl ? "block" : "none";
+    console.log("attemptin to display img")
+  }
 }
 
 async function submitMarker(
@@ -254,6 +265,8 @@ export async function handleMarkerClick(marker, markerId, date_created) {
       });
 
       setTimeout(() => {
+        handleImageDisplay(markerData.imageUrl);
+
         const editButton = document.querySelector(".edit");
 
         if (editButton) {

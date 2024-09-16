@@ -11,14 +11,23 @@
         <span class="close" onclick="closeModal()" style="cursor: pointer"
           >×</span
         >
+        <div id="imageContainer">
+          <button id="deleteImageButton">X</button>
+          <!-- IMAGE_PLACEHOLDER -->
+        </div>
         <h4>Edit Marker</h4>
         <div class="input-container">
-          <input id="name" placeholder=" " autocomplete="off"/>
+          <input id="name" placeholder=" " autocomplete="off" />
           <label for="name">Marker Name</label>
         </div>
 
         <div class="desc-container">
-          <input id="desc" placeholder="Description" maxlength="30" autocomplete="off"/>
+          <input
+            id="desc"
+            placeholder="Description"
+            maxlength="30"
+            autocomplete="off"
+          />
           <label for="desc">Description</label>
         </div>
         <div id="coords">

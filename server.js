@@ -76,6 +76,7 @@ app.get("/currentTemp", (req, res) => {
   });
 });
 
+// Route to upload image
 app.post("/upload", upload.single("image"), async (req, res) => {
   if (!req.file) {
     return res.status(400).send("No file uploaded.");
@@ -120,6 +121,30 @@ app.post("/upload", upload.single("image"), async (req, res) => {
   } catch (err) {
     console.error("Error uploading image to Imgbb:", err.message);
     res.status(500).json({ error: "Failed to upload image." });
+  }
+});
+
+// Route to delete image
+app.delete("/api/delete-image/:id", async (req, res) => {
+  const markerId = req.params.id;
+  try {
+    console.log("Deleting image for marker ID:", markerId);
+    const query = "UPDATE camp_locations SET imageUrl = NULL WHERE id = ?";
+    const result = await db.run(query, markerId);
+
+    // Check if any rows were updated
+    if (result.changes > 0) {
+      console.log("Image deletion successful for marker ID:", markerId);
+      res
+        .status(200)
+        .send({ success: true, message: "image deletion success" });
+    } else {
+      console.log("Marker not found with ID:", markerId);
+      res.status(404).send({ success: false, message: "marker not found" });
+    }
+  } catch (error) {
+    console.error("Error deleting image", error);
+    res.status(500).send({ success: false, message: "failed to delete image" });
   }
 });
 

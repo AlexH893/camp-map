@@ -63,14 +63,12 @@ div#requestedWeather {
   background-color: #aed08e;
 }
 #imageContainer {
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
-  height: 28vh;
+  display: none;
+
 }
 
 #imageContainer .image {
-  width: 90%;
+  width: 100%;
   height: 25vh;
 }
 #imageForm {

@@ -3,13 +3,12 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet" href="markerModal.css" />
+    <link rel="stylesheet" href="../marker/markerModal.css" />
   </head>
   <body>
     <div class="info-window-content">
       <div id="imageContainer">
         <!-- IMAGE_PLACEHOLDER -->
-
       </div>
       <h4 id="markerName"><!-- NAME_PLACEHOLDER --></h4>
       <p id="markerDesc"><!-- DESCRIPTION_PLACEHOLDER --></p>
@@ -52,12 +51,16 @@
           value="<!-- DYNAMIC_ID -->"
         />
         <label for="fileUpload">Upload JPG:</label>
-        <input type="file" id="fileUpload" name="image" accept=".jpg, .jpeg" /><br>
+        <input
+          type="file"
+          id="fileUpload"
+          name="image"
+          accept=".jpg, .jpeg"
+        /><br />
         <button type="button" id="uploadButton">Upload</button>
       </form>
       <div id="uploadStatus"></div>
     </div>
-    <script type="module" src="./addMarker.js"></script>
-    <script type="module" src="./editMarker.js"></script>
+    <script type="module" src="./js/editMarker.js"></script>
   </body>
 </html>

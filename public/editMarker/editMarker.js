@@ -1,4 +1,4 @@
-import { loadMarkers } from "./index.js";
+import { loadMarkers } from "../index.js";
 let modalLoaded = false;
 let markerId = null;
 
@@ -10,11 +10,11 @@ export async function loadEditModal() {
   }
 
   try {
-    const response = await fetch("editMarkerModal.html");
+    let response = await fetch("../editMarker/editMarkerModal.html");
     if (!response.ok) {
       throw new Error("Failed to load edit marker modal");
     }
-    const modalHtml = await response.text();
+    let modalHtml = await response.text();
     document.body.insertAdjacentHTML("beforeend", modalHtml);
 
     modalLoaded = true;
@@ -23,21 +23,21 @@ export async function loadEditModal() {
   }
 }
 
-// Function to detect if click is outside the modal and close it
+// Detect click outside modal and close it
 function outsideClickListener(event) {
-  const modalContainer = document.getElementById("editModalContainer");
+  let modalContainer = document.getElementById("editModalContainer");
   if (modalContainer && !modalContainer.contains(event.target)) {
     closeModal();
-    removeClickListener(); // Remove the event listener after modal is closed
+    removeClickListener();
   }
 }
 
-// Add the event listener to close modal on outside click
+// Add listener to close modal when clicking outside
 function addClickListener() {
   document.addEventListener("click", outsideClickListener);
 }
 
-// Remove the event listener
+// Remove the click listener
 function removeClickListener() {
   document.removeEventListener("click", outsideClickListener);
 }
@@ -48,31 +48,31 @@ export async function handleEdit(button) {
   await loadEditModal();
 
   // Find modal
-  const modalContainer = document.getElementById("editModalContainer");
+  let modalContainer = document.getElementById("editModalContainer");
   if (!modalContainer) {
     console.error("Modal container not found. Ensure it exists in the HTML.");
     return;
   }
 
-  // Get the marker ID from the button's data-id attribute
+  // Get marker ID from button
   markerId = button.getAttribute("data-id");
 
   // Display the modal
   modalContainer.style.display = "block";
 
   // Set up submit button listener
-  const submitButton = document.getElementById("submit");
+  let submitButton = document.getElementById("submit");
   if (submitButton) {
     submitButton.setAttribute("data-id", markerId);
 
-    // Remove old listener if it exists and add a new listener
+    // Remove old listener and add new one
     submitButton.removeEventListener("click", handleSubmit);
     submitButton.addEventListener("click", async () => {
-      const markerId = submitButton.getAttribute("data-id");
+      let markerId = submitButton.getAttribute("data-id");
 
       if (markerId) {
         try {
-          await editMarker(markerId); // Ensure you have the editMarker function defined properly
+          await editMarker(markerId);
         } catch (error) {
           console.error("Error while editing marker:", error);
         }
@@ -84,61 +84,59 @@ export async function handleEdit(button) {
     console.error("Submit button not found.");
   }
 
-  // Fetch and populate content with the correct marker ID
+  // Fetch and populate content with correct marker ID
   try {
     await fetchContent(markerId);
   } catch (error) {
     console.error("Error fetching content for marker ID:", markerId, error);
   }
 
-  // Add click listener for closing modal when clicking outside
+  // Add click listener for closing modal on outside click
   addClickListener();
 }
 
-// Hide the modal
+// Close the modal
 export function closeModal() {
-  const modalContainer = document.getElementById("editModalContainer");
+  let modalContainer = document.getElementById("editModalContainer");
   if (modalContainer) {
     modalContainer.style.display = "none";
-    removeClickListener(); // Remove the listener when modal is closed
+    removeClickListener();
   }
 }
 
-// Handle submit button click
+// Submit the edited marker data
 async function handleSubmit() {
-  const submitButton = document.getElementById("submit");
-  const markerId = submitButton ? submitButton.getAttribute("data-id") : null;
+  let submitButton = document.getElementById("submit");
+  let markerId = submitButton ? submitButton.getAttribute("data-id") : null;
 
   if (markerId) {
-    // Pass the markerId from the button
     await editMarker(markerId);
   } else {
     console.error("Marker ID not found");
   }
 }
 
-// Fetch marker data from the API
+// Fetch marker data from API
 export async function fetchContent(markerId) {
   try {
-    const response = await fetch(`/api/markers/${markerId}`);
+    let response = await fetch(`/api/markers/${markerId}`);
     if (!response.ok) {
       throw new Error(`HTTP error! Status: ${response.status}`);
     }
 
-    const markerDataArray = await response.json();
+    let markerDataArray = await response.json();
 
-    // Assuming the API returns an array and you need the first item
-    const markerData = Array.isArray(markerDataArray)
+    // Get the first item
+    let markerData = Array.isArray(markerDataArray)
       ? markerDataArray[0]
       : markerDataArray;
 
-    // Check if markerData contains expected fields
     if (!markerData) {
       console.error("Marker data is empty.");
       return;
     }
 
-    // Populate the modal fields with marker data
+    // Populate modal fields with marker data
     document.getElementById("name").value = markerData.name || "";
     document.getElementById("desc").value = markerData.desc || "";
     document.getElementById("lat").innerText = markerData.lat || "";
@@ -146,22 +144,19 @@ export async function fetchContent(markerId) {
     document.getElementById("elevation").innerText = markerData.elevation || "";
 
     // Handling the image display
-    const imageContainer = document.getElementById("imageContainer");
-    const deleteButton = document.getElementById("deleteImageButton");
+    let imageContainer = document.getElementById("imageContainer");
     if (imageContainer && markerData.imageUrl) {
       imageContainer.innerHTML = `
         <img src="${markerData.imageUrl}" alt="Uploaded Image" style="max-width: 100%; height: auto;">
         <button id="deleteImageButton">X</button>
       `;
-      // Adding an event listener to delete the image
       document
         .getElementById("deleteImageButton")
         .addEventListener("click", async () => {
-         console.log("test");
           await deleteImage(markerId);
         });
     } else {
-      imageContainer.innerHTML = "";
+      imageContainer.innerHTML = "No Image";
     }
   } catch (error) {
     console.error("Error fetching marker data:", error);
@@ -169,17 +164,17 @@ export async function fetchContent(markerId) {
 }
 
 // Submit edited marker data
-export async function editMarker(markerId, AdvancedMarkerElement) {
+export async function editMarker(markerId) {
   if (!markerId) {
     console.error("Marker ID not provided for editing.");
     return;
   }
 
-  const name = document.getElementById("name").value;
-  const desc = document.getElementById("desc").value;
+  let name = document.getElementById("name").value;
+  let desc = document.getElementById("desc").value;
 
   try {
-    const response = await fetch(`/api/update-marker/${markerId}`, {
+    let response = await fetch(`/api/update-marker/${markerId}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ name, desc }),
@@ -197,26 +192,26 @@ export async function editMarker(markerId, AdvancedMarkerElement) {
   }
 }
 
+// Delete marker image
 async function deleteImage(markerId) {
   try {
-    const response = await fetch(`/api/delete-image/${markerId}`, {
+    let response = await fetch(`/api/delete-image/${markerId}`, {
       method: "DELETE",
       headers: { "Content-Type": "application/json" },
     });
 
     if (response.ok) {
-      console.log("img deletion success");
-      // Removing img from modal
-      const imageContainer = document.getElementById("imageContainer");
+      console.log("Image deletion successful.");
+      let imageContainer = document.getElementById("imageContainer");
       imageContainer.innerHTML = "No Image";
     } else {
-      console.error("Failed to delete image");
+      console.error("Failed to delete image.");
     }
-  } catch {
-    console.error("Failed to delete iamge", error);
+  } catch (error) {
+    console.error("Error deleting image:", error);
   }
 }
 
-// Expose functions globally
+// Expose globally if needed
 window.handleEdit = handleEdit;
 window.closeModal = closeModal;

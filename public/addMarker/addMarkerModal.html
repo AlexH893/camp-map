@@ -1,12 +1,11 @@
-<!-- addMarkerModal.html -->
 <!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Add Marker Modal</title>
-    <link rel="stylesheet" href="addMarkerModal.css" />
-    <script type="module" src="./disableButton.js"></script>
+    <link rel="stylesheet" href="../addMarker/addMarkerModal.css" />
+    <script type="module" src="../js/buttonHandler.js"></script>
   </head>
   <body>
     <div id="modalContainer" class="info-window-content">
@@ -25,31 +24,26 @@
       <div id="markerInfo">
         <div id="geoInfo">
           <p><!-- ELEVATION_PLACEHOLDER --></p>
-          <p>
-            <!-- LATITUDE_PLACEHOLDER -->
-            <!-- LATITUDE_PLACEHOLDER -->
-          </p>
-          <p>
-            <!-- LONGITUDE_PLACEHOLDER -->
-            <!-- LONGITUDE_PLACEHOLDER -->
-          </p>
+          <p><!-- LATITUDE_PLACEHOLDER --></p>
+          <p><!-- LONGITUDE_PLACEHOLDER --></p>
         </div>
       </div>
 
       <div id="buttons">
         <button
           id="getWeather"
-          onclick="console.log(window.selectedLatLng); getWeather(window.selectedLatLng.lat, window.selectedLatLng.lng)"
+          onclick="getWeather(window.selectedLatLng.lat, window.selectedLatLng.lng)"
         >
           Get Weather
         </button>
-        <button id="submit-button" name="submit">Submit</button>
-        <button name="close" class="close" onclick="deleteAddition();">
-          X
+        <button id="submit-button" name="submit" onclick="handleSubmit()">
+          Submit
         </button>
+        <button name="close" class="close">X</button>
       </div>
     </div>
-    <script type="module" src="./addMarker.js"></script>
-    <script type="module" src="./getWeather.js"></script>
+
+    <script type="module" src="../js/getWeather.js"></script>
+    <script type="module" src="../js/disableButton.js"></script>
   </body>
 </html>

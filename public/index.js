@@ -1,6 +1,8 @@
 import { Loader } from "../node_modules/@googlemaps/js-api-loader/dist/index.mjs";
-import { addMarker, handleMarkerClick } from "./addMarker.js";
-export let currentInfoWindow = null;
+import { addMarker } from "./addMarker/addMarker.js";
+import { handleMarkerClick } from "./marker/markerHandler.js";
+
+// export let currentInfoWindow = null;
 
 let map;
 window.markers = {};
@@ -9,9 +11,9 @@ window.markers = {};
 fetch("/api/getApiKey")
   .then((response) => response.json())
   .then((data) => {
-    const { apiKey } = data;
+    let { apiKey } = data;
 
-    const loader = new Loader({
+    let loader = new Loader({
       apiKey: apiKey,
       version: "weekly",
       libraries: ["places", "marker"],
@@ -21,7 +23,7 @@ fetch("/api/getApiKey")
       .importLibrary("maps")
       .then(async () => {
         // Load the AdvancedMarkerElement here before using it
-        const { AdvancedMarkerElement } = await google.maps.importLibrary(
+        let { AdvancedMarkerElement } = await google.maps.importLibrary(
           "marker"
         );
         console.log("Google Maps API version:", google.maps.version);
@@ -36,7 +38,7 @@ fetch("/api/getApiKey")
         // Pass the AdvancedMarkerElement to the loadMarkers function
         loadMarkers(AdvancedMarkerElement);
 
-        const locationButton = document.getElementById("locationButton");
+        let locationButton = document.getElementById("locationButton");
         map.controls[google.maps.ControlPosition.BOTTOM_RIGHT].push(
           locationButton
         );
@@ -48,9 +50,9 @@ fetch("/api/getApiKey")
           addMarkerButton
         );
 
-        const input = document.getElementById("pac-input");
+        let input = document.getElementById("pac-input");
         input.placeholder = "Search coordinates, places";
-        const searchBox = new google.maps.places.SearchBox(input);
+        let searchBox = new google.maps.places.SearchBox(input);
         map.controls[google.maps.ControlPosition.TOP_LEFT].push(input);
 
         map.addListener("bounds_changed", () => {
@@ -60,7 +62,7 @@ fetch("/api/getApiKey")
         let markers = [];
 
         searchBox.addListener("places_changed", () => {
-          const places = searchBox.getPlaces();
+          let places = searchBox.getPlaces();
 
           if (places.length == 0) {
             return;
@@ -71,7 +73,7 @@ fetch("/api/getApiKey")
           });
           markers = [];
 
-          const bounds = new google.maps.LatLngBounds();
+          let bounds = new google.maps.LatLngBounds();
 
           places.forEach((place) => {
             if (!place.geometry || !place.geometry.location) {
@@ -79,7 +81,7 @@ fetch("/api/getApiKey")
               return;
             }
 
-            const icon = {
+            let icon = {
               url: place.icon,
               size: new google.maps.Size(71, 71),
               origin: new google.maps.Point(0, 0),
@@ -105,13 +107,13 @@ fetch("/api/getApiKey")
           map.fitBounds(bounds);
         });
 
-        const infoWindow = new google.maps.InfoWindow();
+        let infoWindow = new google.maps.InfoWindow();
 
         locationButton.addEventListener("click", () => {
           if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(
               (position) => {
-                const pos = {
+                let pos = {
                   lat: position.coords.latitude,
                   lng: position.coords.longitude,
                 };
@@ -121,7 +123,7 @@ fetch("/api/getApiKey")
                 });
                 markers = [];
 
-                const marker = new AdvancedMarkerElement({
+                let marker = new AdvancedMarkerElement({
                   position: pos,
                   map: map,
                   title: "Your Location",
@@ -150,7 +152,7 @@ fetch("/api/getApiKey")
 
 // Error handling function for location services
 function handleLocationError(browserHasGeolocation, infoWindow, pos) {
-  const errorMessage = browserHasGeolocation
+  let errorMessage = browserHasGeolocation
     ? "Error: The Geolocation service failed."
     : "Error: Your browser doesn't support geolocation.";
 
@@ -172,18 +174,38 @@ export function loadMarkers(AdvancedMarkerElement) {
 
       markersData.forEach((markerData) => {
         try {
-          const marker = new AdvancedMarkerElement({
+          // Define the color
+          let markerColor = "#6B8E23";
+          let insideMarkerColor = "#7E8F59";
+
+          // Create an SVG string with the desired color
+          let svgMarkerString = `
+            <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24">
+              <circle cx="12" cy="12" r="10" fill="${markerColor}" />
+              <circle cx="12" cy="12" r="8" fill="${insideMarkerColor}" /> <!-- Optional inner circle -->
+            </svg>
+          `;
+
+          // Convert the SVG string into a DOM node using DOMParser
+          let parser = new DOMParser();
+          let svgMarker = parser.parseFromString(
+            svgMarkerString,
+            "image/svg+xml"
+          ).documentElement;
+
+          let marker = new AdvancedMarkerElement({
             position: { lat: markerData.lat, lng: markerData.lng },
             map: map,
             title: markerData.name,
             id: markerData.id,
+            // Set the SVG node as the marker content
+            content: svgMarker,
           });
 
-          const dateCreated = markerData.date_created;
+          let dateCreated = markerData.date_created;
 
           // Store marker in the global markers object
           window.markers[markerData.id] = marker;
-          console.log("loaded marker id(s): " + markerData.id);
           marker.desc = markerData.desc;
 
           // Attach click event for modal display

@@ -152,7 +152,9 @@ app.use((req, res, next) => {
 
 // Route to create a marker
 app.post("/api/add-marker", (req, res) => {
-  let { name, desc, lat, lng, elevation, date_created, imageUrl } = req.body;
+  let { name, desc, lat, lng, elevation, date_created, imageUrl, type } =
+    req.body;
+  console.log("Received request body:", req.body);
 
   // Log the incoming request body
   console.log("Received request to add marker with data:", {
@@ -163,11 +165,12 @@ app.post("/api/add-marker", (req, res) => {
     elevation,
     date_created,
     imageUrl,
+    type,
   });
 
   let query =
-    "INSERT into camp_locations (name, desc, lat, lng, elevation, date_created, imageUrl) VALUES (?,?,?,?,?,?,?)";
-  let params = [name, desc, lat, lng, elevation, date_created, imageUrl];
+    "INSERT into camp_locations (name, desc, lat, lng, elevation, date_created, imageUrl, type) VALUES (?,?,?,?,?,?,?,?)";
+  let params = [name, desc, lat, lng, elevation, date_created, imageUrl, type];
 
   // Log the SQL query and parameters
   console.log("Executing query:", query);

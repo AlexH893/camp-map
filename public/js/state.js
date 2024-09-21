@@ -12,10 +12,10 @@ export function getInSelectionMode() {
 export function toggleButtonState() {
   let addMarkerButton = document.getElementById("addMarkerButton");
   if (inSelectionMode) {
-    console.log("Disabling add marker btn");
+    // console.log("Disabling add marker btn");
     addMarkerButton.disabled = true;
   } else {
-    console.log("Enabling add marker btn");
+    // console.log("Enabling add marker btn");
     addMarkerButton.disabled = false;
   }
 }

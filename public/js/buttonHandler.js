@@ -1,4 +1,7 @@
-import { currentInfoWindow } from "../marker/markerHandler.js";
+import {
+  getCurrentInfoWindow,
+  setCurrentInfoWindow,
+} from "../marker/markerHandler.js";
 import { loadMarkers } from "../index.js";
 import { setInSelectionMode, toggleButtonState } from "../js/state.js";
 import { submitMarker } from "../addMarker/addMarker.js";
@@ -16,6 +19,8 @@ export async function deleteAddition() {
 
 export function handleSubmit() {
   console.log("Submit button clicked");
+  const type = window.type;
+  console.log(window.type);
 
   const nameInput = document.getElementById("name");
   const descInput = document.getElementById("desc");
@@ -37,6 +42,11 @@ export function handleSubmit() {
   const lat = window.selectedLatLng.lat;
   const lng = window.selectedLatLng.lng;
 
+  if (!type) {
+    alert("type not selected");
+    return;
+  }
+
   // Access the globally stored elevation
   const elevationInFeet = window.elevationInFeet;
 
@@ -45,9 +55,16 @@ export function handleSubmit() {
     alert("Elevation data could not be retrieved. Please try again.");
     return;
   }
-
-  // Call the submitMarker function here
-  submitMarker(name, desc, lat, lng, elevationInFeet);
+  submitMarker(
+    name,
+    desc,
+    lat,
+    lng,
+    elevationInFeet,
+    getCurrentInfoWindow(),
+    google.maps.marker.AdvancedMarkerElement,
+    type
+  );
 }
 
 window.handleSubmit = handleSubmit;

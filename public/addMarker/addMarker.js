@@ -15,118 +15,134 @@ import { loadMarkers } from "../index.js";
 let markerCounter = 0;
 
 export async function addMarker(map) {
-  let snackbar = document.getElementById("snackbar");
-  snackbar.className = "show";
+  // Handle flyout menu type selection
+  let type = null;
 
-  setTimeout(() => {
-    snackbar.className = snackbar.className.replace("show", "");
-  }, 3000);
+  document.getElementById("addCampSpot").addEventListener("click", () => {
+    type = "camp";
+    window.type = type;
+    activateMarkerPlacement();
+  });
 
-  setInSelectionMode(true);
+  document.getElementById("addWaypoint").addEventListener("click", () => {
+    type = "waypoint";
+    window.type = type;
+    activateMarkerPlacement();
+  });
 
-  if (getInSelectionMode()) {
-    toggleButtonState();
+  function activateMarkerPlacement() {
+    let snackbar = document.getElementById("snackbar");
+    snackbar.className = "show";
 
-    let clickListener = map.addListener("click", async (event) => {
-      let { lat, lng } = event.latLng.toJSON();
-      window.selectedLatLng = { lat, lng };
+    setTimeout(() => {
+      snackbar.className = snackbar.className.replace("show", "");
+    }, 3000);
 
-      try {
-        // Create the marker and increment markerCounter
-        let marker = new google.maps.marker.AdvancedMarkerElement({
-          position: event.latLng,
-          map: map,
-          title: "New Marker",
-        });
+    setInSelectionMode(true);
 
-        let markerId = `marker-${markerCounter++}`;
+    if (getInSelectionMode()) {
+      toggleButtonState();
 
-        let { elevationInFeet, latLong } = await getElevation(lat, lng);
-        window.elevationInFeet = elevationInFeet;
+      let clickListener = map.addListener("click", async (event) => {
+        let { lat, lng } = event.latLng.toJSON();
+        window.selectedLatLng = { lat, lng };
 
-        let content = await fetchContent("../addMarker/addMarkerModal.html");
-        content = updateContent(
-          content,
-          elevationInFeet,
-          latLong,
-          "New Marker",
-          "No description",
-          markerId
-        );
-        window.markers = window.markers || {};
-        marker.id = markerId;
-        window.markers[marker.id] = marker;
-
-        let infoWindow = new google.maps.InfoWindow({
-          content: content,
-          ariaLabel: "Test",
-        });
-
-        infoWindow.open({ anchor: marker, map, shouldFocus: false });
-        setCurrentInfoWindow(infoWindow);
-
-        // Create a temporary container to parse the HTML string
-        const tempDiv = document.createElement("div");
-        // Convert string to DOM
-        tempDiv.innerHTML = infoWindow.getContent();
-
-        // Now, query the DOM from tempDiv
-        let submitButton = tempDiv.querySelector("#submit-button");
-        if (submitButton) {
-          console.log("Submit button found");
-          submitButton.addEventListener("click", () => {
-            console.log("Submit button clicked");
-            let nameInput = tempDiv.querySelector("#name");
-            if (!nameInput.value.trim()) {
-              alert("Name is required");
-              nameInput.focus();
-              return;
-            }
-
-            let descInput = tempDiv.querySelector("#desc");
-            let name = nameInput.value;
-            let desc = descInput ? descInput.value : "No description";
-
-            console.log(
-              "AdvancedMarkerElement in submitMarker:",
-              AdvancedMarkerElement
-            );
-            console.log("Elevation before submit:", elevationInFeet);
-
-            submitMarker(
-              name,
-              desc,
-              window.selectedLatLng.lat,
-              window.selectedLatLng.lng,
-              elevationInFeet,
-              infoWindow,
-              google.maps.marker.AdvancedMarkerElement
-            );
-
-            marker.desc = desc;
-            handleMarkerClick(marker);
+        try {
+          // Create the marker and increment markerCounter
+          let marker = new google.maps.marker.AdvancedMarkerElement({
+            position: event.latLng,
+            map: map,
+            title: "New Marker",
           });
-        } else {
-          console.error("Submit button not found.");
-        }
 
-        // Attach event listener to the close button dynamically after the InfoWindow is loaded
-        let closeButton = tempDiv.querySelector("button[name='close']");
-        if (closeButton) {
-          console.log("Close button found");
-          closeButton.addEventListener("click", () => {
-            console.log("Close button clicked");
-            deleteAddition();
+          let markerId = `marker-${markerCounter++}`;
+
+          let { elevationInFeet, latLong } = await getElevation(lat, lng);
+          window.elevationInFeet = elevationInFeet;
+
+          let content = await fetchContent("../addMarker/addMarkerModal.html");
+          content = updateContent(
+            content,
+            elevationInFeet,
+            latLong,
+            "New Marker",
+            "No description",
+            markerId
+          );
+          window.markers = window.markers || {};
+          marker.id = markerId;
+          window.markers[marker.id] = marker;
+
+          let infoWindow = new google.maps.InfoWindow({
+            content: content,
+            ariaLabel: "Test",
           });
-        } else {
-          console.error("Close button not found.");
-        }
 
-        google.maps.event.removeListener(clickListener);
-      } catch (error) {
-        console.error("Error adding marker:", error);
-      }
-    });
+          infoWindow.open({ anchor: marker, map, shouldFocus: false });
+          setCurrentInfoWindow(infoWindow);
+
+          // Create a temporary container to parse the HTML string
+          const tempDiv = document.createElement("div");
+          // Convert string to DOM
+          tempDiv.innerHTML = infoWindow.getContent();
+
+          // Now, query the DOM from tempDiv
+          let submitButton = tempDiv.querySelector("#submit-button");
+          if (submitButton) {
+            console.log("Submit button found");
+            submitButton.addEventListener("click", () => {
+              console.log("Submit button clicked");
+              let nameInput = tempDiv.querySelector("#name");
+              if (!nameInput.value.trim()) {
+                alert("Name is required");
+                nameInput.focus();
+                return;
+              }
+
+              let descInput = tempDiv.querySelector("#desc");
+              let name = nameInput.value;
+              let desc = descInput ? descInput.value : "No description";
+
+              console.log("Elevation before submit:", elevationInFeet);
+              console.log(window.type);
+              console.log("type before submit:", window.type);
+
+              submitMarker(
+                name,
+                desc,
+                window.selectedLatLng.lat,
+                window.selectedLatLng.lng,
+                elevationInFeet,
+                infoWindow,
+                google.maps.marker.AdvancedMarkerElement,
+                window.type
+              );
+
+              marker.desc = desc;
+              handleMarkerClick(marker);
+            });
+          } else {
+            console.error("Submit button not found.");
+          }
+
+          // Attach event listener to the close button dynamically after the InfoWindow is loaded
+          let closeButton = tempDiv.querySelector("button[name='close']");
+          if (closeButton) {
+            console.log("Close button found");
+            closeButton.addEventListener("click", () => {
+              console.log("Close button clicked");
+              deleteAddition();
+            });
+          } else {
+            console.error("Close button not found.");
+          }
+
+          google.maps.event.removeListener(clickListener);
+        } catch (error) {
+          console.error("Error adding marker:", error);
+        }
+      });
+    }
   }
 }
 
@@ -138,7 +154,8 @@ export async function submitMarker(
   lng,
   elevationInFeet,
   infoWindow,
-  AdvancedMarkerElement
+  AdvancedMarkerElement,
+  type
 ) {
   try {
     let response = await fetch("/api/add-marker", {
@@ -152,6 +169,7 @@ export async function submitMarker(
         lat,
         lng,
         elevation: elevationInFeet,
+        type,
       }),
     });
 
@@ -163,8 +181,8 @@ export async function submitMarker(
     setInSelectionMode(false);
     toggleButtonState();
 
-    if (infoWindow) {
-      infoWindow.close();
+    if (getCurrentInfoWindow()) {
+      getCurrentInfoWindow().close();
     }
   } catch (error) {
     console.error("Error submitting marker:", error);

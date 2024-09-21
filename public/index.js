@@ -217,3 +217,22 @@ export function loadMarkers(AdvancedMarkerElement) {
     })
     .catch((error) => console.error("Error loading markers:", error));
 }
+document.addEventListener("DOMContentLoaded", () => {
+  const addMarkerButton = document.getElementById("addMarkerButton");
+  const flyoutMenu = document.getElementById("addMarkerFlyout");
+
+  addMarkerButton.addEventListener("click", (event) => {
+    // Toggle the display of the flyout menu
+    if (flyoutMenu.style.display === "block") {
+      flyoutMenu.style.display = "none";
+    } else {
+      // Position the flyout menu just above the button
+      const buttonRect = addMarkerButton.getBoundingClientRect();
+      flyoutMenu.style.top = `${
+        buttonRect.top - flyoutMenu.offsetHeight - 100
+      }px`; // 5px gap above the button
+      flyoutMenu.style.left = `${buttonRect.left}px`; // Align with the button
+      flyoutMenu.style.display = "block";
+    }
+  });
+});

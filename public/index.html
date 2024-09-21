@@ -9,7 +9,7 @@
     <script defer type="module" src="index.js"></script>
     <script defer type="module" src="./deleteMarker/deleteMarker.js"></script>
 
-    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="./styles.css" />
   </head>
   <body>
     <h3>Camp Map</h3>
@@ -19,16 +19,16 @@
       type="text"
       placeholder="Search Box"
     />
-
-    <!-- The div element for the map -->
     <div id="map"></div>
-
     <button id="locationButton">Get Current Location</button>
     <button id="addMarkerButton">Add Marker</button>
+    <div id="addMarkerFlyout" class="flyout-menu">
+      <button id="addCampSpot" data-type="camp">Add Camp Spot</button>
+      <button id="addWaypoint" data-type="waypoint">Add Waypoint</button>
+    </div>
 
     <div id="snackbar">Click desired location to add marker</div>
     <script defer type="module" src="./editMarker/editMarker.js"></script>
     <!-- <script defer type="module" src="./js/buttonHandler.js"></script> -->
-
   </body>
 </html>

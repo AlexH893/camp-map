@@ -5,27 +5,23 @@
 
 /* The snackbar - position it at the bottom and in the middle of the screen */
 #snackbar {
-  visibility: hidden; /* Hidden by default. Visible on click */
-  min-width: 250px; /* Set a default minimum width */
-  margin-left: -125px; /* Divide value of min-width by 2 */
-  background-color: #333; /* Black background color */
-  color: #fff; /* White text color */
-  text-align: center; /* Centered text */
-  border-radius: 2px; /* Rounded borders */
-  padding: 16px; /* Padding */
-  position: fixed; /* Sit on top of the screen */
-  z-index: 1; /* Add a z-index if needed */
-  left: 50%; /* Center the snackbar */
-  bottom: 30px; /* 30px from the bottom */
+  position: absolute; /* Position absolute for toast */
+  top: 20px; /* Adjust this value to move it up/down */
+  left: 50%; /* Center horizontally */
+  transform: translateX(-50%); /* Centering adjustment */
+  z-index: 1000; /* Ensure it's above other elements */
+  background-color: #333; /* Background color */
+  color: #fff; /* Text color */
+  padding: 16px;
+  border-radius: 5px;
+  display: none; /* Initially hidden */
+  transition: visibility 0s, opacity 0.5s linear; /* Smooth transition */
 }
 
-/* Show the snackbar when clicking on a button (class added with JavaScript) */
+/* Show the toast */
 #snackbar.show {
-  visibility: visible; /* Show the snackbar */
-  /* Add animation: Take 0.5 seconds to fade in and out the snackbar.
-  However, delay the fade out process for 2.5 seconds */
-  -webkit-animation: fadein 0.5s, fadeout 0.5s 1.5s;
-  animation: fadein 0.5s, fadeout 0.5s 1.5s;
+  display: block; /* Make it visible */
+  opacity: 1; /* Full opacity */
 }
 
 /* Animations to fade the snackbar in and out */
@@ -71,4 +67,29 @@
     bottom: 0;
     opacity: 0;
   }
+}
+
+.flyout-menu {
+  position: absolute;
+  top: -60px; /* Adjust this value based on the height of flyout menu */
+  left: 0; /* Aligns with the left edge of the button */
+  background-color: white;
+  border: 1px solid #ddd;
+  padding: 10px;
+  display: none; /* Initially hidden */
+  z-index: 1000;
+}
+
+.flyout-menu button {
+  display: block;
+  width: 100%;
+  padding: 8px;
+  margin-bottom: 5px;
+  background-color: #f0f0f0;
+  border: none;
+  cursor: pointer;
+}
+
+.flyout-menu button:hover {
+  background-color: #ddd;
 }

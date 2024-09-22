@@ -175,8 +175,18 @@ export function loadMarkers(AdvancedMarkerElement) {
       markersData.forEach((markerData) => {
         try {
           // Define the color
-          let markerColor = "#6B8E23";
-          let insideMarkerColor = "#7E8F59";
+          let markerColor, insideMarkerColor;
+
+          if (markerData.type === "camp") {
+            markerColor = "#FF6347";
+            insideMarkerColor = "#FF7F50";
+          } else if (markerData.type === "waypoint") {
+            markerColor = "#6B8E23";
+            insideMarkerColor = "#7E8F59";
+          } else {
+            markerColor = "#6B8E23";
+            insideMarkerColor = "#7E8F59";
+          }
 
           // Create an SVG string with the desired color
           let svgMarkerString = `
@@ -209,7 +219,12 @@ export function loadMarkers(AdvancedMarkerElement) {
           marker.desc = markerData.desc;
 
           // Attach click event for modal display
-          handleMarkerClick(marker, markerData.id, dateCreated);
+          handleMarkerClick(
+            marker,
+            markerData.id,
+            dateCreated,
+            markerData.type
+          );
         } catch (error) {
           console.error("Error creating marker:", error);
         }

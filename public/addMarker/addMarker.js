@@ -55,7 +55,9 @@ export async function addMarker(map) {
             title: "New Marker",
           });
 
+          marker.type = type;
           let markerId = `marker-${markerCounter++}`;
+          console.log("Marker type after creation:", marker.type);
 
           let { elevationInFeet, latLong } = await getElevation(lat, lng);
           window.elevationInFeet = elevationInFeet;
@@ -89,16 +91,15 @@ export async function addMarker(map) {
           // Now, query the DOM from tempDiv
           let submitButton = tempDiv.querySelector("#submit-button");
           if (submitButton) {
-            console.log("Submit button found");
+            console.log("Submit button found in addMarker:", submitButton);
+
             submitButton.addEventListener("click", () => {
-              console.log("Submit button clicked");
+              console.log("Submit button clicked in add marker");
               let nameInput = tempDiv.querySelector("#name");
               if (!nameInput.value.trim()) {
-                alert("Name is required");
+                alert("Name is required in addmarker");
                 nameInput.focus();
-                return;
               }
-
               let descInput = tempDiv.querySelector("#desc");
               let name = nameInput.value;
               let desc = descInput ? descInput.value : "No description";
@@ -119,7 +120,7 @@ export async function addMarker(map) {
               );
 
               marker.desc = desc;
-              handleMarkerClick(marker);
+              handleMarkerClick(marker, markerId, date_created, window.type);
             });
           } else {
             console.error("Submit button not found.");

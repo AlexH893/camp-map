@@ -12,9 +12,9 @@ export const getCurrentInfoWindow = () => currentInfoWindow;
 export const setCurrentInfoWindow = (infoWindow) => {
   currentInfoWindow = infoWindow;
 };
-
+const type = window.type;
 // Handling marker click
-export async function handleMarkerClick(marker, markerId, date_created) {
+export async function handleMarkerClick(marker, markerId, date_created, type) {
   marker.addListener("click", async () => {
     if (getInSelectionMode()) {
       alert("no");
@@ -39,9 +39,8 @@ export async function handleMarkerClick(marker, markerId, date_created) {
       let content = await fetchContent(contentUrl);
 
       // Fetch marker data from API or your data source
-      let response = await fetch(`/api/markers/${markerId}`);
+      let response = await fetch(`/api/markers/${markerId}?type=${type}`);
       let markerData = await response.json();
-
       content = updateContent(
         content,
         elevationInFeet,
@@ -50,10 +49,11 @@ export async function handleMarkerClick(marker, markerId, date_created) {
         marker.desc || "No description",
         markerId,
         date_created,
-        markerData.imageUrl
+        markerData.imageUrl,
+        type
       );
 
-      console.log("Displaying info window for marker ID:", markerId);
+      // console.log("Displaying info window for marker ID:", markerId);
 
       let infoWindow = new google.maps.InfoWindow({
         content: content,
@@ -114,6 +114,7 @@ export async function handleMarkerClick(marker, markerId, date_created) {
             let formData = new FormData();
             formData.append("image", file);
             formData.append("markerId", markerId);
+            formData.append("type", type);
 
             try {
               let response = await fetch("/upload", {

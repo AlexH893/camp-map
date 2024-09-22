@@ -10,7 +10,8 @@
       <div id="imageContainer">
         <!-- IMAGE_PLACEHOLDER -->
       </div>
-      <h4 id="markerName"><!-- NAME_PLACEHOLDER --></h4>
+      <h3 id="markerName"><!-- NAME_PLACEHOLDER --></h3>
+      <h4 id="markerType"><!-- TYPE_PLACEHOLDER --></h4>
       <p id="markerDesc"><!-- DESCRIPTION_PLACEHOLDER --></p>
       <div id="weatherResponse"></div>
       <div id="markerInfo">
@@ -25,7 +26,13 @@
         </p>
       </div>
       <div id="buttons">
-        <button class="edit" data-id="<!-- DYNAMIC_ID -->">Edit</button>
+        <button
+          class="edit"
+          data-id="<!-- DYNAMIC_ID -->"
+          data-type="<!-- DYNAMIC_TYPE2 -->"
+        >
+          Edit
+        </button>
 
         <button
           id="getWeather"
@@ -38,6 +45,7 @@
           name="delete"
           class="delete"
           data-id="<!-- DYNAMIC_ID2 -->"
+          data-type="<!-- DYNAMIC_TYPE -->"
           onclick="window.handleDelete(this)"
         >
           Delete

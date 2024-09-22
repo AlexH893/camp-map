@@ -18,7 +18,8 @@ export async function deleteAddition() {
 }
 
 export function handleSubmit() {
-  console.log("Submit button clicked");
+  console.log("Submit button clicked - handleSubvmit");
+
   const type = window.type;
   console.log(window.type);
 

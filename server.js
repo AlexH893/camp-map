@@ -105,9 +105,20 @@ app.post("/upload", upload.single("image"), async (req, res) => {
     }
 
     let markerId = req.body.markerId;
+    let { type } = req.body; // Get type from the request body
+
+    // Determine the table based on the marker type
+    let table;
+    if (type === "camp") {
+      table = "camp_locations";
+    } else if (type === "waypoint") {
+      table = "waypoint_locations";
+    } else {
+      return res.status(400).json({ error: "Invalid marker type." });
+    }
 
     // Save the image URL in the database associated with the marker
-    let query = `UPDATE camp_locations SET imageUrl = ? WHERE id = ?`;
+    let query = `UPDATE ${table} SET imageUrl = ? WHERE id = ?`;
     let params = [imageUrl, markerId];
 
     db.run(query, params, function (err) {
@@ -127,14 +138,26 @@ app.post("/upload", upload.single("image"), async (req, res) => {
 // Route to delete image
 app.delete("/api/delete-image/:id", async (req, res) => {
   let markerId = req.params.id;
+  let { type } = req.query; // Get type from query parameters
+
+  // Determine the table based on the marker type
+  let table;
+  if (type == "camp") {
+    table = "camp_locations";
+  } else if (type == "waypoint") {
+    table = "waypoint_locations";
+  } else {
+    return res.status(400).json({ error: "Invalid marker type." });
+  }
+
   try {
-    let query = "UPDATE camp_locations SET imageUrl = NULL where id = ?";
+    let query = `UPDATE ${table} SET imageUrl = NULL WHERE id = ?`;
     await db.run(query, markerId);
 
-    res.status(200).send({ message: "image deletion success" });
+    res.status(200).send({ message: "Image deletion success" });
   } catch (error) {
     console.error("Error deleting image", error);
-    res.status(500).send({ message: "failed to delete image" });
+    res.status(500).send({ message: "Failed to delete image" });
   }
 });
 
@@ -152,24 +175,19 @@ app.use((req, res, next) => {
 
 // Route to create a marker
 app.post("/api/add-marker", (req, res) => {
+  let table;
   let { name, desc, lat, lng, elevation, date_created, imageUrl, type } =
     req.body;
   console.log("Received request body:", req.body);
 
-  // Log the incoming request body
-  console.log("Received request to add marker with data:", {
-    name,
-    desc,
-    lat,
-    lng,
-    elevation,
-    date_created,
-    imageUrl,
-    type,
-  });
+  if (type == "camp") {
+    table = "camp_locations";
+  } else {
+    table = "waypoint_locations";
+  }
 
-  let query =
-    "INSERT into camp_locations (name, desc, lat, lng, elevation, date_created, imageUrl, type) VALUES (?,?,?,?,?,?,?,?)";
+  let query = `INSERT INTO ${table} (name, desc, lat, lng, elevation, date_created, imageUrl, type) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`;
+
   let params = [name, desc, lat, lng, elevation, date_created, imageUrl, type];
 
   // Log the SQL query and parameters
@@ -199,10 +217,20 @@ app.post("/api/add-marker", (req, res) => {
 
 // Route to update deleted marker flag
 app.put("/api/delete-marker", (req, res) => {
-  let { deleted, id } = req.body;
+  let { deleted, id, type } = req.body;
+
+  // Determine the table based on the marker type
+  let table;
+  if (type == "camp") {
+    table = "camp_locations";
+  } else if (type == "waypoint") {
+    table = "waypoint_locations";
+  } else {
+    return res.status(400).json({ error: "Invalid marker type." });
+  }
 
   let query = `
-    UPDATE camp_locations
+    UPDATE ${table}
     SET deleted = ?
     WHERE id = ?
   `;
@@ -225,11 +253,21 @@ app.put("/api/delete-marker", (req, res) => {
 
 // Route to update marker info
 app.put("/api/update-marker/:id", (req, res) => {
-  let { name, desc } = req.body;
+  let { name, desc, type } = req.body;
   let { id } = req.params;
 
+  // Determine the table based on the marker type
+  let table;
+  if (type == "camp") {
+    table = "camp_locations";
+  } else if (type == "waypoint") {
+    table = "waypoint_locations";
+  } else {
+    return res.status(400).json({ error: "Invalid marker type." });
+  }
+
   let query = `
-    UPDATE camp_locations
+    UPDATE ${table}
     SET name = ?,
         desc = ?
     WHERE id = ?
@@ -253,7 +291,11 @@ app.put("/api/update-marker/:id", (req, res) => {
 
 // Route to get all markers from db
 app.get("/api/markers", (req, res) => {
-  let query = "SELECT * FROM camp_locations WHERE deleted = 0";
+  let query = `
+    SELECT * FROM camp_locations WHERE deleted = 0
+    UNION ALL
+    SELECT * FROM waypoint_locations WHERE deleted = 0
+  `;
 
   db.all(query, [], (err, rows) => {
     if (err) {
@@ -267,7 +309,19 @@ app.get("/api/markers", (req, res) => {
 // Route to get a marker by id
 app.get("/api/markers/:id", (req, res) => {
   let markerId = req.params.id;
-  let query = "SELECT * FROM camp_locations WHERE id = ? AND deleted = 0";
+  let type = req.query.type; // Get type from query parameters
+
+  // Determine the table based on the marker type
+  let table;
+  if (type == "camp") {
+    table = "camp_locations";
+  } else if (type == "waypoint") {
+    table = "waypoint_locations";
+  } else {
+    return res.status(400).json({ error: "Invalid marker type." });
+  }
+
+  let query = `SELECT * FROM ${table} WHERE id = ? AND deleted = 0`;
 
   db.get(query, [markerId], (err, row) => {
     if (err) {

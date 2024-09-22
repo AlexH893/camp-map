@@ -20,7 +20,8 @@ export function updateContent(
   desc,
   markerId,
   date_created,
-  imageUrl
+  imageUrl,
+  type
 ) {
   let updatedContent = content
     .replace(
@@ -36,6 +37,7 @@ export function updateContent(
       latLong ? `Longitude: ${latLong.lng}` : ""
     )
     .replace(/<!-- NAME_PLACEHOLDER -->/, name || "No Name")
+    .replace(/<!-- TYPE_PLACEHOLDER -->/, type || "No Type")
     .replace(/<!-- DESCRIPTION_PLACEHOLDER -->/, desc || "No description")
     .replace(/<!-- DYNAMIC_ID -->/, markerId || "")
     .replace(/<!-- DYNAMIC_ID2 -->/, markerId || "")
@@ -45,7 +47,9 @@ export function updateContent(
       imageUrl
         ? `<img src="${imageUrl}" alt="Marker Image" class="image" style="display: block;">`
         : ""
-    );
+    )
+    .replace(/<!-- DYNAMIC_TYPE -->/, type || "camp")
+    .replace(/<!-- DYNAMIC_TYPE2 -->/, type || "camp"); // Default to "waypoint" if type is missing
 
   // Replace dynamic marker IDs using a loop to avoid repetition
   return updatedContent.replace(/<!-- DYNAMIC_ID -->/g, markerId || "");

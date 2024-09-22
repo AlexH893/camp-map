@@ -56,6 +56,7 @@ export async function handleEdit(button) {
 
   // Get marker ID from button
   markerId = button.getAttribute("data-id");
+  let type = button.getAttribute("data-type");
 
   // Display the modal
   modalContainer.style.display = "block";
@@ -64,15 +65,17 @@ export async function handleEdit(button) {
   let submitButton = document.getElementById("submit");
   if (submitButton) {
     submitButton.setAttribute("data-id", markerId);
+    submitButton.setAttribute("data-type", type);
 
     // Remove old listener and add new one
     submitButton.removeEventListener("click", handleSubmit);
     submitButton.addEventListener("click", async () => {
       let markerId = submitButton.getAttribute("data-id");
+      let type = submitButton.getAttribute("data-type");
 
       if (markerId) {
         try {
-          await editMarker(markerId);
+          await editMarker(markerId, type);
         } catch (error) {
           console.error("Error while editing marker:", error);
         }
@@ -86,7 +89,7 @@ export async function handleEdit(button) {
 
   // Fetch and populate content with correct marker ID
   try {
-    await fetchContent(markerId);
+    await fetchContent(markerId, type);
   } catch (error) {
     console.error("Error fetching content for marker ID:", markerId, error);
   }
@@ -108,18 +111,19 @@ export function closeModal() {
 async function handleSubmit() {
   let submitButton = document.getElementById("submit");
   let markerId = submitButton ? submitButton.getAttribute("data-id") : null;
+  let type = submitButton ? submitButton.getAttribute("data-type") : null;
 
   if (markerId) {
-    await editMarker(markerId);
+    await editMarker(markerId, type);
   } else {
     console.error("Marker ID not found");
   }
 }
 
 // Fetch marker data from API
-export async function fetchContent(markerId) {
+export async function fetchContent(markerId, type) {
   try {
-    let response = await fetch(`/api/markers/${markerId}`);
+    let response = await fetch(`/api/markers/${markerId}?type=${type}`);
     if (!response.ok) {
       throw new Error(`HTTP error! Status: ${response.status}`);
     }
@@ -142,6 +146,7 @@ export async function fetchContent(markerId) {
     document.getElementById("lat").innerText = markerData.lat || "";
     document.getElementById("lng").innerText = markerData.lng || "";
     document.getElementById("elevation").innerText = markerData.elevation || "";
+    document.getElementById("markerType").innerText = markerData.type || "";
 
     // Handling the image display
     let imageContainer = document.getElementById("imageContainer");
@@ -153,7 +158,7 @@ export async function fetchContent(markerId) {
       document
         .getElementById("deleteImageButton")
         .addEventListener("click", async () => {
-          await deleteImage(markerId);
+          await deleteImage(markerId, type);
         });
     } else {
       imageContainer.innerHTML = "No Image";
@@ -164,7 +169,7 @@ export async function fetchContent(markerId) {
 }
 
 // Submit edited marker data
-export async function editMarker(markerId) {
+export async function editMarker(markerId, type) {
   if (!markerId) {
     console.error("Marker ID not provided for editing.");
     return;
@@ -177,7 +182,7 @@ export async function editMarker(markerId) {
     let response = await fetch(`/api/update-marker/${markerId}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name, desc }),
+      body: JSON.stringify({ name, desc, type }), // Move `type` to request body
     });
 
     if (response.ok) {
@@ -185,7 +190,8 @@ export async function editMarker(markerId) {
       closeModal();
       loadMarkers(google.maps.marker.AdvancedMarkerElement);
     } else {
-      console.error("Failed to update marker.");
+      const errorMessage = await response.text();
+      console.error("Failed to update marker:", errorMessage);
     }
   } catch (error) {
     console.error("Error updating marker:", error);
@@ -193,9 +199,9 @@ export async function editMarker(markerId) {
 }
 
 // Delete marker image
-async function deleteImage(markerId) {
+async function deleteImage(markerId, type) {
   try {
-    let response = await fetch(`/api/delete-image/${markerId}`, {
+    let response = await fetch(`/api/delete-image/${markerId}?type=${type}`, {
       method: "DELETE",
       headers: { "Content-Type": "application/json" },
     });

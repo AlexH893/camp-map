@@ -7,6 +7,8 @@ import { loadMarkers } from "../index.js";
 export async function handleDelete(button) {
   let id = button.getAttribute("data-id");
   console.log(`Deleting marker with ID: ${id}`);
+  let type = button.getAttribute("data-type"); // Retrieve the marker type from the button
+  console.log(`Deleting marker with ID: ${id} and type: ${type}`);
 
   // Close current InfoWindow if open
   const currentWindow = getCurrentInfoWindow();
@@ -14,17 +16,17 @@ export async function handleDelete(button) {
     currentWindow.close();
   }
 
-  await deleteMarker(id);
+  await deleteMarker(id, type);
 }
 
-export async function deleteMarker(id) {
+export async function deleteMarker(id, type) {
   try {
     let response = await fetch("/api/delete-marker", {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ deleted: 1, id: id }),
+      body: JSON.stringify({ deleted: 1, id: id, type: type }),  // Include the type
     });
 
     let data = await response.json();

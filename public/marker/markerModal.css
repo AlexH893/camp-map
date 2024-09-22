@@ -13,6 +13,12 @@ div#requestedWeather {
   text-align: center;
   font-size: medium;
 }
+#markerType {
+  margin: auto;
+  width: 50%;
+  text-align: center;
+  font-size: medium;
+}
 
 /* 
   The area at top of an infoWindow

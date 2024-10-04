@@ -81,18 +81,17 @@ fetch("/api/getApiKey")
               return;
             }
 
-            let icon = {
-              url: place.icon,
-              size: new google.maps.Size(71, 71),
-              origin: new google.maps.Point(0, 0),
-              anchor: new google.maps.Point(17, 34),
-              scaledSize: new google.maps.Size(25, 25),
-            };
+            let markerContent = document.createElement("div");
+            markerContent.classList.add("custom-marker");
+            markerContent.style.backgroundImage = `url(${place.icon})`;
+            markerContent.style.width = "25px";
+            markerContent.style.height = "25px";
+            markerContent.style.backgroundSize = "contain";
 
             markers.push(
               new AdvancedMarkerElement({
                 map,
-                icon,
+                content: markerContent,
                 title: place.name,
                 position: place.geometry.location,
               })
@@ -105,6 +104,7 @@ fetch("/api/getApiKey")
             }
           });
           map.fitBounds(bounds);
+          map.setZoom(18);
         });
 
         let infoWindow = new google.maps.InfoWindow();
@@ -232,22 +232,41 @@ export function loadMarkers(AdvancedMarkerElement) {
     })
     .catch((error) => console.error("Error loading markers:", error));
 }
+// Flyout menu handling
 document.addEventListener("DOMContentLoaded", () => {
   const addMarkerButton = document.getElementById("addMarkerButton");
   const flyoutMenu = document.getElementById("addMarkerFlyout");
+  const addCampSpotButton = document.getElementById("addCampSpot");
+  const addWaypointButton = document.getElementById("addWaypoint");
 
-  addMarkerButton.addEventListener("click", (event) => {
-    // Toggle the display of the flyout menu
+  // Toggle flyout menu on button click
+  addMarkerButton.addEventListener("click", () => {
     if (flyoutMenu.style.display === "block") {
       flyoutMenu.style.display = "none";
     } else {
-      // Position the flyout menu just above the button
       const buttonRect = addMarkerButton.getBoundingClientRect();
       flyoutMenu.style.top = `${
         buttonRect.top - flyoutMenu.offsetHeight - 100
-      }px`; // 5px gap above the button
-      flyoutMenu.style.left = `${buttonRect.left}px`; // Align with the button
+      }px`;
+      flyoutMenu.style.left = `${buttonRect.left}px`;
       flyoutMenu.style.display = "block";
     }
+  });
+
+  // Close the flyout when selecting an option
+  const closeFlyout = () => {
+    flyoutMenu.style.display = "none";
+  };
+
+  addCampSpotButton.addEventListener("click", (event) => {
+    const markerType = event.target.dataset.type;
+    console.log(`Selected marker type: ${markerType}`);
+    closeFlyout();
+  });
+
+  addWaypointButton.addEventListener("click", (event) => {
+    const markerType = event.target.dataset.type;
+    console.log(`Selected marker type: ${markerType}`);
+    closeFlyout();
   });
 });

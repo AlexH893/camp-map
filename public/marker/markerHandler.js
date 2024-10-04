@@ -131,7 +131,7 @@ export async function handleMarkerClick(marker, markerId, date_created, type) {
 
                 let imageContainer = document.getElementById("imageContainer");
                 if (imageContainer) {
-                  imageContainer.innerHTML = `<img src="${result.imageUrl}" alt="Uploaded Image" style="max-width: 100%; height: auto;">`;
+                  imageContainer.innerHTML = `<img src="${result.imageUrl}" alt="Uploaded Image" style="max-width: 100%; height: 30%;">`;
                 }
               } else {
                 document.getElementById("uploadStatus").innerText =

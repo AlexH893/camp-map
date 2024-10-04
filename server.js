@@ -86,8 +86,8 @@ app.post("/upload", upload.single("image"), async (req, res) => {
     console.log(req.file); // Debugging line
 
     let form = new FormData();
-    // Converting file buffer to base64
-    form.append("image", req.file.buffer.toString("base64"));
+    // Converting file buffer to base64 with Buffer
+    form.append("image", Buffer.from(req.file.buffer).toString("base64"));
     form.append("key", "2a349d17e6d9e364ae745c226c5f7b86");
 
     // Send the image to Imgbb
@@ -98,12 +98,13 @@ app.post("/upload", upload.single("image"), async (req, res) => {
     });
 
     console.log(response.data); // Log response data for debugging
-    let imageUrl = response.data.data.url;
 
-    if (!imageUrl) {
+    // Check for success response
+    if (!response.data || !response.data.data || !response.data.data.url) {
       throw new Error("Image URL is undefined in response");
     }
 
+    let imageUrl = response.data.data.url;
     let markerId = req.body.markerId;
     let { type } = req.body; // Get type from the request body
 

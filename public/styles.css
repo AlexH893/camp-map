@@ -1,7 +1,17 @@
 #map {
-  height: 85vh;
-  width: 100%;
+  height: 90vh;
+  width: 70%;
+  flex: 1;
 }
+
+#container {
+  display: flex;
+}
+
+#zoomToMarker {
+  margin-bottom: 1em;
+}
+
 
 /* The snackbar - position it at the bottom and in the middle of the screen */
 #snackbar {

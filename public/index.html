@@ -13,13 +13,26 @@
   </head>
   <body>
     <h3>Camp Map</h3>
+    <!-- <div id="side-panel-container"></div> -->
     <input
       id="pac-input"
       class="controls"
       type="text"
       placeholder="Search Box"
     />
-    <div id="map"></div>
+    <div id="container">
+      <div id="map"></div>
+      <div
+        id="side-panel-container"
+        style="
+          width: 300px;
+          overflow-y: auto;
+          background-color: #f0f0f0;
+          height: 85vh;
+        "
+      ></div>
+    </div>
+
     <button id="locationButton">Get Current Location</button>
     <button id="addMarkerButton">Add Marker</button>
     <div id="addMarkerFlyout" class="flyout-menu">

@@ -31,14 +31,14 @@ export async function addMarker(map) {
   });
 
   function activateMarkerPlacement() {
+    setInSelectionMode(true);
+
     let snackbar = document.getElementById("snackbar");
     snackbar.className = "show";
 
     setTimeout(() => {
       snackbar.className = snackbar.className.replace("show", "");
     }, 3000);
-
-    setInSelectionMode(true);
 
     if (getInSelectionMode()) {
       toggleButtonState();

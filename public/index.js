@@ -1,11 +1,19 @@
 import { Loader } from "../node_modules/@googlemaps/js-api-loader/dist/index.mjs";
 import { addMarker } from "./addMarker/addMarker.js";
 import { handleMarkerClick } from "./marker/markerHandler.js";
+import {
+  setInSelectionMode,
+  getInSelectionMode,
+  toggleButtonState,
+} from "../js/state.js";
 
 // export let currentInfoWindow = null;
 
 let map;
 window.markers = {};
+
+let idleListener;
+export const debouncedLoadMarkers = debounce(loadMarkers, 300);
 
 // Fetch the API key and load the Google Maps API
 fetch("/api/getApiKey")
@@ -35,8 +43,15 @@ fetch("/api/getApiKey")
           mapId: "DEMO_MAP_ID",
         });
 
+        // Listen for the 'idle' event to ensure map bounds are ready
+        idleListener = map.addListener("idle", () => {
+          if (!getInSelectionMode()) {
+            debouncedLoadMarkers(AdvancedMarkerElement);
+          }
+        });
+
         // Pass the AdvancedMarkerElement to the loadMarkers function
-        loadMarkers(AdvancedMarkerElement);
+        // loadMarkers(AdvancedMarkerElement);
 
         let locationButton = document.getElementById("locationButton");
         map.controls[google.maps.ControlPosition.BOTTOM_RIGHT].push(
@@ -217,6 +232,7 @@ export function loadMarkers(AdvancedMarkerElement) {
           // Store marker in the global markers object
           window.markers[markerData.id] = marker;
           marker.desc = markerData.desc;
+          marker.type = markerData.type;
 
           // Attach click event for modal display
           handleMarkerClick(
@@ -229,6 +245,13 @@ export function loadMarkers(AdvancedMarkerElement) {
           console.error("Error creating marker:", error);
         }
       });
+
+      // Check if map bounds are defined
+      if (map && map.getBounds()) {
+        updateSidePanel(map, window.markers);
+      } else {
+        console.error("Map bounds are not defined yet.");
+      }
     })
     .catch((error) => console.error("Error loading markers:", error));
 }
@@ -269,4 +292,67 @@ document.addEventListener("DOMContentLoaded", () => {
     console.log(`Selected marker type: ${markerType}`);
     closeFlyout();
   });
+
+  fetch("./sidePanel/side-panel.html")
+    .then((response) => response.text())
+    .then((html) => {
+      document.getElementById("side-panel-container").innerHTML = html;
+    })
+    .catch((error) => console.error("Error loading side panel:", error));
 });
+
+function updateSidePanel(map, markers) {
+  // Get map's current bounds
+  let bounds = map.getBounds();
+
+  // Ensure bounds are available
+  if (!bounds) {
+    console.error("Map bounds are not defined yet.");
+    return;
+  }
+
+  // Then get side panel element
+  let markerList = document.getElementById("marker-list");
+  // console.log(markerList);
+
+  // Clear current marker list
+  markerList.innerHTML = "";
+
+  // Loop thru all markers, check if they're within map bounds
+  Object.values(markers).forEach((marker) => {
+    if (marker && marker.position && bounds.contains(marker.position)) {
+      // Then add marker details to side panel
+      let li = document.createElement("li");
+
+      const titleTypeSpan = document.createElement("span");
+      titleTypeSpan.textContent = `${marker.title} - ${marker.type}`;
+
+      const descSpan = document.createElement("span");
+      descSpan.textContent = marker.desc;
+
+      const typeSpan = document.createElement("span");
+      typeSpan.textContent = `${marker.type}`;
+
+      let btn = document.createElement("button");
+      btn.id = "zoomToMarker";
+      btn.textContent = "Zoom";
+
+      li.appendChild(titleTypeSpan);
+      li.appendChild(document.createElement("br"));
+      li.appendChild(descSpan);
+      li.appendChild(document.createElement("br"));
+      li.appendChild(btn);
+      markerList.appendChild(li);
+    }
+  });
+}
+
+function debounce(func, delay) {
+  let timeoutId;
+  return (...args) => {
+    clearTimeout(timeoutId);
+    timeoutId = setTimeout(() => {
+      func.apply(this, args);
+    }, delay);
+  };
+}
